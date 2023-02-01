@@ -39,3 +39,17 @@ I ultimately decided that I would obtain feature data using a popular estate age
 ##### More information about my project proposal:<br>[04_project_proposal.md](capstone_steps%2Fstep_04%2F04_project_proposal.md)
 
 ##### More information wrangling and cleaning my data: <br>[05__data_wrangling.md](capstone_steps%2Fstep_05%2F05__data_wrangling.md)
+
+
+## Running the WebApp
+### Running the WebApp Remotely
+
+You can access the running demo of the webapp at:
+https://jayportfolio-webapp-capstone-app-0526gb.streamlit.app/
+
+### Running the WebApp Locally
+
+Download this repository and ensure you have the dependencies listed in [requirements.txt](requirements.txt).
+
+To run the Streamlit app, run:<br>
+`streamlit run app.py`
