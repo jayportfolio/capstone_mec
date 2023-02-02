@@ -812,7 +812,6 @@ def include_in_html_report(type, section_header=None, section_figure=None, secti
 
             for section_content in section_content_list:
                 if isinstance(section_content, str):
-                    import ast
                     section_content = ast.literal_eval(section_content)
 
                 with open(writePath_html, 'a') as f1:
