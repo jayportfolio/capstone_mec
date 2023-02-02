@@ -621,7 +621,7 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape, X_train_index.sh
 
 trainable_model, ALGORITHM_DETAIL, chosen_epochs, chosen_params = make_simple_ann(selected_neural_network)
 
-if quick_mode: chosen_epochs=20
+if quick_mode: chosen_epochs=5
 ALGORITHM_DETAIL
 
 
@@ -859,7 +859,7 @@ if run_env not in ['colab']:
     except:
         print(f"haven't scored this model yet: {ALGORITHM}")
         old_best_score = -999
-    this_model_is_best = update_results(old_results_json, new_results, key)
+    this_model_is_best = update_results(old_results_json, new_results, key, directory=prefix_dir_results)
 
 print(key)
 print(ALGORITHM_DETAIL)
@@ -895,11 +895,8 @@ from bs4 import BeautifulSoup
 
 def include_in_html_report(type, section_header=None, section_figure=None, section_content=None, section_content_list=None):
 
-    # writePath_html = r'model_results/%s (html).html' % key
-    # writePath_md = r'model_results/%s (md).md' % key
-    results_root = '../../F_evaluate_model'
-    writePath_html = f'{results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
-    writePath_md = f'{results_root}/markdown/{key}.md'
+    writePath_html = f'{prefix_dir_results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
+    writePath_md = f'{prefix_dir_results_root}/markdown/{key}.md'
 
 #isinstance(ini_list2, list)
     if not section_content_list:
@@ -930,7 +927,7 @@ def include_in_html_report(type, section_header=None, section_figure=None, secti
         elif type=='graph':
             filename = key + "_" + section_content
             #section_figure.savefig(f'model_results/artifacts/{filename.replace(" ", "_")}')
-            section_figure.savefig(f'{results_root}/artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}')
+            section_figure.savefig(f'{prefix_dir_results_root}/artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}')
 
             with open(writePath_html, 'a') as f1:
                 dfAsString = f'<img src="../artifacts/{filename.replace(" ","_").replace("(", "_").replace(")", "_")}"/>'
@@ -1046,7 +1043,7 @@ include_in_html_report(type="text", section_header="Model Structure", section_co
 include_in_html_report("header", section_content=f"Comparison with other models", section_figure=2)
 
 
-dff = pd.read_json('../../../results/results.json')
+dff = pd.read_json(prefix_dir_results_root + '/results.json')
 
 version = VERSION
 
