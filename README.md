@@ -40,14 +40,49 @@ I ultimately decided that I would obtain feature data using a popular estate age
 
 ##### More information wrangling and cleaning my data: <br>[05__data_wrangling.md](capstone_steps%2Fstep_05%2F05__data_wrangling.md)
 
+### Samples of my datasets
+* [Basic listings data](data%2Flistings_data_basic_sample.csv)
+* [Detailed Listing data](data%2Flistings_data_enriched_sample.csv)
+* [Website datalayer model object data (standard)](data%2Flistings_data_jsonmeta_sample.csv)
+* [Website datalayer model object data (metadata)](data%2Flistings_data_jsonmodel_sample.csv)
 
-## Running the WebApp
-### Running the WebApp Remotely
+
+
+### Using the code to train the model
+
+Download this repository and ensure you have the dependencies listed in [requirements.txt](requirements.txt).
+
+Run the relevant python script for the model you wish to train: <br>
+* Train a standard model: <br>`python process/E_train_model/all_models_except_neural_networks.py` <br><br>
+* Train a neural network: <br>`python process/E_train_model/neural_networks_model.py`<br><br>
+* Train a standard model, using PCA dimension reduction: <br>`python process/E_train_model/all_models_except_neural_networks_with_pca.py`<br><br>
+* Train a neural network with PCA dimension reduction: <br>`python process/E_train_model/all_models_except_neural_networks_with_pca.py`<br><br>
+* Train multiple standard models : <br>`python process/E_train_model/run_multiple_all_model_except_neural.py`<br><br>
+* Train multiple neural networks : <br>`python process/E_train_model/run_multiple_neural_networks_model.py`<br><br>
+
+The model will be available in this folder: [models](models)<br>
+You can find the models I have already trained in this folder: [models_pretrained](models_pretrained) <br>
+
+Any comparative results you generate will be available in this folder: [F_evaluate_model](process%2FF_evaluate_model)<br>
+You can see my comparative results here: | [html version](capstone_steps%2Fstep_07%2Fhtml) | [markdown version](capstone_steps%2Fstep_07%2Fmarkdown) | [raw results](capstone_steps%2Fstep_07%2Fresults) |
+
+You can compare the respective results from the various models trained in this folder:
+| [html version](capstone_steps%2Fstep_07%2Fhtml%2FSummary.html) | [markdown version](capstone_steps%2Fstep_07%2Fmarkdown%2FSummary.md) |
+
+
+##### More information about my work with standard Mochine Learning algorithms:<br>[07_all_models_except_neural_networks.py](capstone_steps%2Fstep_07%2F07_all_models_except_neural_networks.py)
+
+##### More information about my work with Deep Learning algorithms:<br>[08_prototyping machine learning and deep learning models.md](capstone_steps%2Fstep_08%2F08_prototyping%20machine%20learning%20and%20deep%20learning%20models.md)
+
+##### More information about my work scaling the model with additional features:<br>[09_00_scaling_my_ml_and_dl_prototypes.md](capstone_steps%2Fstep_09%2F09_00_scaling_my_ml_and_dl_prototypes.md)
+
+### Running the WebApp
+#### Running the WebApp Remotely
 
 You can access the running demo of the webapp at:
 https://jayportfolio-webapp-capstone-app-0526gb.streamlit.app/
 
-### Running the WebApp Locally
+#### Running the WebApp Locally
 
 Download this repository and ensure you have the dependencies listed in [requirements.txt](requirements.txt).
 

@@ -13,14 +13,14 @@ The data collected is broken into 4 categories:
 
 #### Part 1. Data from the search results pages, which list all matching properties
 
-Example: https://www.rightmove.co.uk/property-for-sale/find.html?locationIdentifier=REGION%5E61227&maxPrice=600000&minPrice=550000&sortType=1&index=216&propertyTypes=bungalow%2Cdetached%2Cflat%2Csemi-detached%2Cterraced&includeSSTC=true&mustHave=&dontShow=retirement&furnishTypes=&keywords=
+Example: /property-for-sale/find.html?locationIdentifier=REGION%5E61227&maxPrice=600000&minPrice=550000&sortType=1&index=216&propertyTypes=bungalow%2Cdetached%2Cflat%2Csemi-detached%2Cterraced&includeSSTC=true&mustHave=&dontShow=retirement&furnishTypes=&keywords=
 ![img.png](../../capstone_artifacts/images/05__01_img.png)
 
 ---
 
 #### Part 2. Data from the individual property pages
 
-Example: https://www.rightmove.co.uk/properties/123478178#/?channel=RES_NEW
+Example: properties/123478178#/?channel=RES_NEW
 ![img.png](../../capstone_artifacts/images/05__02_img.png)
 
 ---

@@ -46,11 +46,11 @@ def main():
             'train_test/X_train_no_nulls.csv',
             'train_test/y_test.csv', 'train_test/y_test_no_nulls.csv', 'train_test/y_train.csv',
             'train_test/y_train_no_nulls.csv',
-            'models/model_Decision Tree.pkl',
-            'models/model_Deep Neural Network.pkl',
-            'models/model_HistGradientBoostingRegressor.pkl',
-            'models/model_Linear Regression.pkl',
-            'models/model_Linear Regression (Keras).pkl',
+            'models_pretrained/model_Decision Tree.pkl',
+            'models_pretrained/model_Deep Neural Network.pkl',
+            'models_pretrained/model_HistGradientBoostingRegressor.pkl',
+            'models_pretrained/model_Linear Regression.pkl',
+            'models_pretrained/model_Linear Regression (Keras).pkl',
             'random_instance.csv',
             'random_instance_plus.csv',
             # functions.FINAL_RECENT_FILE,
@@ -74,7 +74,7 @@ def main():
         'optimised_model_KNN_v06',
         'optimised_model_Linear Regression (Ridge)_v06',
         'optimised_model_Neural Network_v06',
-        'optimised_model_XGBoost_v06',
+        'optimised_model_XG Boost_v06',
         # 'Decision Tree',
         # 'Linear Regression',
         # 'Deep Neural Network',
@@ -84,7 +84,7 @@ def main():
     selected_model = st.selectbox('Which model do you want to use?', available_models)
 
     try:
-        model_path = f'models/{selected_model}.pkl'
+        model_path = f'models_pretrained/{selected_model}.pkl'
         model = pickle.load(open(model_path, 'rb'))
     except:
         raise ValueError(f'no model: {model_path}')
@@ -107,39 +107,15 @@ def main():
 
         if not manual_parameters:
             try:
-                print("0")
-                print()
-                print()
-                print()
                 random_instance_plus = np.loadtxt("random_instance_plus.csv", delimiter=",")
-                print("1")
                 print(random_instance_plus)
-                print()
-                print()
                 rand_index = int(random_instance_plus[0])
-                print("2")
                 print(rand_index)
-                print()
-                print()
                 expected = random_instance_plus[1]
-                print("3")
                 print(expected)
-                print()
-                print()
-                print()
                 inputs = [random_instance_plus[2:]]
-                print("4")
                 print([random_instance_plus[2:]])
-                print()
-                print()
-                print()
             except:
-                # raise ValueError()
-                print()
-                print()
-                print()
-                print()
-                print()
                 print("----- VALUEERROR -----")
                 rand_index = random.randint(0, test_size - 1)
                 inputs = [X_test[rand_index]]
@@ -147,22 +123,7 @@ def main():
                 expected = y_test[rand_index]
                 np.savetxt("random_instance.csv", random_instance, delimiter=",")
                 random_instance_plus = [rand_index, expected]
-                print("random_instance TYPE:", type(random_instance))
-                print("random_instance_plus TYPE:", type(random_instance_plus))
-                print()
-                print()
-                print("random_instance:", random_instance)
-                print("random_instance_plus START:", random_instance_plus)
                 random_instance_plus.extend(random_instance[0])
-                #for each in random_instance:
-                #    random_instance_plus.append(each)
-                print("random_instance_plus MID:", random_instance_plus)
-                print()
-                print()
-                print()
-                print("random_instance_plus FINAL:", random_instance_plus)
-                print()
-                print()
                 np.savetxt("random_instance_plus.csv", random_instance_plus, delimiter=",")
 
             st.text(f'Actual value of property {rand_index}: {expected}')
@@ -202,9 +163,7 @@ def main():
             print("random_instance_plus:", random_instance_plus)
             np.savetxt("random_instance_plus.csv", [random_instance_plus], delimiter=",")
 
-    #df = get_source_dataframe(IN_COLAB=False, VERSION=DATA_VERSION, folder_prefix='')
     if st.checkbox('Show the underlying dataframe'):
-        #df, df_type = get_source_dataframe(IN_COLAB=False, VERSION=DATA_VERSION, folder_prefix='')
         df, df_type = get_source_dataframe(cloud_run=fake_being_in_colab, VERSION=DATA_VERSION, folder_prefix='')
         print("claiming to be colab so I can use the cloud version of data and save space")
         st.write(df)
