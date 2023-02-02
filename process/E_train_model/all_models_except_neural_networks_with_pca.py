@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Decide which algorithm and version of the data we are going to use for model training
 # 
 # Additionally, choose:
@@ -10,9 +8,6 @@
 # * if we'll use full categories instead of dummies
 # * what fraction of the data we'll use for testing (0.1)
 # * if the data split will be randomised (it won't!)
-
-# In[1]:
-
 
 FILENAME = 'all_models_except_neural_networks_with_pca'
 
@@ -24,7 +19,8 @@ ALGORITHM = 'Linear Regression (Ridge)'
 #ALGORITHM = 'CatBoost'
 #ALGORITHM = 'Light Gradient Boosting'
 
-ALGORITHM_DETAIL = 'grid search'
+#ALGORITHM_DETAIL = 'grid search'
+ALGORITHM_DETAIL = 'random search'
 #ALGORITHM_DETAIL = 'rerun best'
 #ALGORITHM_DETAIL = 'custom'
 #DATA_DETAIL = ['no scale','no dummies']
@@ -40,7 +36,6 @@ CROSS_VALIDATION_SCORING = 'r2'
 
 use_dimension_reduction = True # True
 #pca_data_retain = 0.95 #0.5 #0.99 # 0.9999999999999 # 0.95
-pca_data_retain = 0.9999999999999
 pca_data_retain = 0.99
 
 print(f'ALGORITHM: {ALGORITHM}')
@@ -54,6 +49,15 @@ print(f'pca_data_retain: {pca_data_retain}')
 model_uses_feature_importances = 'tree' in ALGORITHM.lower() or 'forest' in ALGORITHM.lower() or 'boost' in ALGORITHM.lower()
 create_python_script = True
 
+import sys
+import os
+prefix_dir_envs = './process/z_envs/'
+prefix_dir_hyperparameters = './'
+prefix_dir_results = './process/F_evaluate_model/'
+prefix_dir_optimised_models = './models/'
+prefix_functions_root = os.path.join('.')
+prefix_dir_results_root = './process/F_evaluate_model'
+
 
 # <code style="background:blue;color:blue">**********************************************************************************************************</code>
 # 
@@ -61,37 +65,30 @@ create_python_script = True
 # 
 # 
 
-# In[2]:
-
-
 from sklearn.impute import SimpleImputer
-import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV
-import numpy as np
 from pandas import DataFrame
 import math
 from termcolor import colored
 from time import time
-import sklearn
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-from sklearn.metrics import r2_score
 import seaborn as sns
 import pickle
-
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from bs4 import BeautifulSoup
+import ast
 import json
 from datetime import datetime
-import matplotlib.pyplot as plt
-import sys
-import os
 
 start_timestamp = datetime.now()
 
-module_path = os.path.abspath(os.path.join('..', '..', '..'))
+module_path = os.path.abspath(prefix_functions_root)
 if module_path not in sys.path:
     #sys.path.append(module_path+"\\zfunctions")
     sys.path.append(module_path)
 
-with open('../../z_envs/_envs.json') as f:
+with open(prefix_dir_envs + '/_envs.json') as f:
     env_vars = json.loads(f.read())
 
 try:
@@ -116,12 +113,10 @@ OVERRIDE_CV = env_vars.get('quick_override_cv_splits', None) if quick_mode else 
 OVERRIDE_N_ITER = env_vars.get('quick_override_n_iter', None) if quick_mode else None
 OVERRIDE_JOBS = env_vars.get('quick_override_n_jobs', None) if quick_mode else None
 OVERRIDE_VERBOSE = 1
-#if quick_mode:OVERRIDE_CV, OVERRIDE_N_ITER = 2, 10
 
 already_timed = False
 no_dummies = 'no dummies' in DATA_DETAIL
 no_scaling = 'no scaling' in DATA_DETAIL
-#not_catboost = 'catboost' not in ALGORITHM.lower() or not no_dummies
 using_catboost = 'catboost' in ALGORITHM.lower()
 
 if run_env not in ['colab', 'gradient', 'cloud']:
@@ -144,26 +139,7 @@ print(env_vars)
 start = datetime.now()
 
 
-# In[3]:
-
-
-if is_jupyter:
-    get_ipython().run_line_magic('pip', 'install tabulate')
-
-    if ALGORITHM == 'CatBoost':
-        get_ipython().run_line_magic('pip', 'install catboost')
-
-    if ALGORITHM == 'Light Gradient Boosting':
-        get_ipython().run_line_magic('pip', 'install lightgbm')
-
-    get_ipython().system('pip install pydot')
-    get_ipython().system('pip install graphviz')
-
-
 # #### Include any overrides specific to the algorthm / python environment being used
-
-# In[4]:
-
 
 running_locally = run_env == 'local'
 
@@ -187,18 +163,8 @@ if 'forest' in ALGORITHM.lower() or True:
     OVERRIDE_VERBOSE = 2
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: defining the model pipeline
 # 
-# 
-
-# In[5]:
-
-
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-
 
 def make_pipeline():
     return Pipeline([
@@ -212,19 +178,10 @@ starter_pipe = make_pipeline()
 starter_pipe
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: get the data
-
-# In[6]:
-
 
 columns, booleans, floats, categories, custom, wildcard = get_columns(version=VERSION)
 LABEL = 'Price'
-
-
-# In[7]:
-
 
 df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
 df_orig = df.copy()
@@ -236,65 +193,21 @@ if retrieval_type != 'tidy':
     df = df[columns]
 
 
-# In[8]:
-
-
 print(colored(f"features", "blue"), "-> ", columns)
 columns.insert(0, LABEL)
 print(colored(f"label", "green", None, ['bold']), "-> ", LABEL)
-
-
-# In[9]:
 
 
 df = preprocess(df, version=VERSION)
 df = df.dropna()
 
 
-# In[10]:
-
-
-df.head(5)
-
-
-# <code
-# style = "background:red;color:red" > ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** </code>
-# 
 # ## NEW Stage: do autoencoding
 # 
 
-# In[11]:
-
-
-import tensorflow as tf
-from keras import layers
-from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Dense
-
-# Tensorflow / Keras
-from tensorflow import keras  # for building Neural Networks
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from sklearn.model_selection import train_test_split
-from keras import layers, losses
-from keras.datasets import fashion_mnist
-from keras.models import Model
-
-print('Keras: %s' % keras.__version__)  # print version
-from keras.models import Model, load_model  # for creating a Neural Network Autoencoder model
-from keras import Input  # for instantiating a keras tensor
-from keras.layers import Dense, LeakyReLU, BatchNormalization  # for adding layers to AE model
-from keras.utils import plot_model  # for plotting model diagram
-
-print("Tensorflow version:", tf.__version__)
-
-
-# In[12]:
 
 
 X_train_orig, X_test_orig, y_train_orig, y_test_orig, X_train_index, X_test_index, y_train_index, y_test_index, df_features, df_labels = create_train_test_data(
@@ -306,24 +219,13 @@ X_train_orig, X_test_orig, y_train_orig, y_test_orig, X_train_index, X_test_inde
 )
 
 if 'forest' in ALGORITHM.lower() or ALGORITHM.lower() == 'light gradient boosting':
-    #y_train_orig = y_train
     y_train_orig = y_train_orig.ravel()
 
-#print(X_train[0])
 print(df.shape)
 print(X_train_orig.shape, X_test_orig.shape, y_train_orig.shape, y_test_orig.shape, X_train_index.shape,
       X_test_index.shape,
       y_train_index.shape, y_test_index.shape)
 
-
-
-# In[ ]:
-
-
-
-
-
-# In[13]:
 
 
 if not use_dimension_reduction:
@@ -355,63 +257,15 @@ else:
     X_train, X_test, y_train, y_test = X_train_orig, X_test_orig, y_train_orig, y_test_orig
 
 
-# In[14]:
-
-
-print(X_train_orig.shape)
-X_train_orig[0:5]
-
-
-# In[15]:
-
-
-print(X_train.shape)
-X_train[0:5]
-
-
-# In[16]:
-
-
-y_train[0:5]
-
-
-# In[17]:
-
-
-X_test[0:5]
-
 
 # End of autoencoding segment
-# 
-# <code
-# style = "background:black;color:black" > ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** </code>
-
-# In[18]:
-
-
-#imputer = SimpleImputer(strategy='mean')
-#imputer.fit(X_train[6])
-#X_train[6] = imputer.transform(X_train[6])
-
-
-# In[19]:
 
 
 starter_model = starter_pipe[-1]
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
-# ## Stage:
-# * #### retrieve the hyperparameters for this model, and
-# * #### train the model
-# 
-# 
 
-# In[20]:
-
-
-options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix='../../../')
+options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters)
 
 if 'explore param' in DATA_DETAIL:
     def automl_step(param_options, vary):
@@ -441,15 +295,8 @@ param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block,
 
 if not using_catboost and len(param_options.keys()) > 2 and not already_timed and debug_mode:
     already_timed = True
-    get_ipython().run_line_magic('timeit', 'starter_pipe.fit(X_train, y_train)')
 
 print("cv:", cv, "n_jobs:", n_jobs, "refit:", refit, "n_iter:", n_iter, "verbose:", verbose)
-#print('\n\nHyperparameters:')
-#param_options if not using_catboost else options_block
-
-
-# In[ ]:
-
 
 def fit_model_with_cross_validation(gs, X_train, y_train, fits):
     pipe_start = time()
@@ -466,7 +313,6 @@ def fit_model_with_cross_validation(gs, X_train, y_train, fits):
         f'max fit/score time     = {round(cv_result.cv_results_["mean_fit_time"].max(), 2)}s/{round(cv_result.cv_results_["mean_score_time"].max(), 2)}s')
     print(f'refit time             = {round(cv_result.refit_time_, 2)}s')
 
-    #return cv_result, average_time, cv_result.refit_time_, len(cv_result.cv_results_["mean_fit_time"])
     return average_time, cv_result.refit_time_, len(cv_result.cv_results_["mean_fit_time"])
 
 
@@ -479,8 +325,7 @@ if not using_catboost:
             cv=cv, n_jobs=n_jobs,  # get the AVX/AVX2 info if use n_jobs > 2
             verbose=verbose, scoring=CROSS_VALIDATION_SCORING,
             refit=refit,
-            return_train_score=True,  #n_iter=n_iter,
-            #error_score='raise'
+            return_train_score=True
         )
     elif ALGORITHM_DETAIL == 'custom':
         user_defined_params = {'model__booster': 'dart', 
@@ -608,14 +453,7 @@ if ALGORITHM_DETAIL == 'grid search' or ALGORITHM_DETAIL == 'grid search (implie
     print(crossval_runner.best_params_)
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Get the results and print some graphs
-# 
-# 
-
-# In[ ]:
-
 
 if not using_catboost:
     best_estimator_pipe = crossval_runner.best_estimator_
@@ -631,18 +469,12 @@ else:
     print(cat_params)
     print(cat_cv_results)
 
-
-# In[ ]:
-
-
 key = f'{ALGORITHM} (v{VERSION})'.lower()
 
 if not using_catboost:
     cv_results_df['params2'] = cv_results_df['params'].apply(lambda l: '/'.join([str(c) for c in l.values()]))
 
     cv_columns = ['params2', 'rank_test_score', 'mean_test_score', 'mean_fit_time', 'mean_score_time', 'params']
-    # if 'Neural' not in ALGORITHM:
-    #     cv_columns.insert(2, 'mean_train_score')
     cv_results_df_full_sorted = cv_results_df.sort_values('rank_test_score')[cv_columns].reset_index(drop=True)
 
     cv_results_df_sorted = cv_results_df_full_sorted[cv_results_df_full_sorted['mean_test_score'] > -2]
@@ -651,7 +483,6 @@ if not using_catboost:
         total_fits = len(cv_results_df_sorted)
 
 if not using_catboost:
-    if is_jupyter: display(cv_results_df_sorted)
 
     orig_debug_mode, orig_display_df_cols = debug_mode, pd.get_option('display.max_columns')
     debug_mode = True
@@ -663,31 +494,14 @@ if not using_catboost:
     cv_results_df_summary = cv_results_df[debug_cols].head(7)
     cv_results_df_summary.set_index('rank_test_score', inplace=True)
 
-    if is_jupyter: display(cv_results_df_summary)
 
-
-# <code style="background:blue;color:blue">**************</code>
+ #### Mini Stage: Make predictions
 # 
-# #### Mini Stage: Make predictions
-# 
-# 
-
-# In[ ]:
-
 
 if not using_catboost:
     y_pred = best_estimator_pipe.predict(X_test)
 else:
     y_pred = starter_model.predict(pool_Xtest)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
 
 
 y_pred = y_pred.reshape((-1, 1))
@@ -702,14 +516,6 @@ print('Mean Absolute Error Accuracy', MAE)
 print('Mean Squared Error Accuracy', MSE)
 print('Root Mean Squared Error', RMSE)
 
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
 
 
 compare = np.hstack((y_test_index, y_test, y_pred))
@@ -729,27 +535,14 @@ combined['bedrooms'] = combined['bedrooms'].astype(int)
 combined
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
 
 best_model_fig, best_model_ax = plt.subplots()
 best_model_ax.scatter(y_test, y_pred, edgecolors=(0, 0, 1))
 best_model_ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
 best_model_ax.set_ylabel('Predicted')
 best_model_ax.set_xlabel('Actual')
-#ax.title.set_text(f'CV Chosen best option ({calculated_best_pipe[1]})')
 
 plt.show()
-
-
-# In[ ]:
-
 
 if not using_catboost:
     def custom_model_and_predictions(model, graph_params, X_train, y_train, X_test):
@@ -812,28 +605,11 @@ if not using_catboost:
                                                                      figsize=(15, 45))
 
     ax_index = -1
-    #for i in best_model_scores.keys():
     for i, ax_index in zip(best_model_scores.keys(), range(0, len(best_model_scores.keys()))):
-        #ax_index += 1
-        #print(len(best_model_scores.keys()))
-        #print('i',i, "ax_index",ax_index)
         if i >= 0:
-            # plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
-            # plt.scatter(y_test, best_model_predictions[i])
-            # # plt.title(str(i) + " " + str(round(best_model_scores[i], 4)) + " for " + str(best_models[i]))
-            # if len(best_models[i].keys()) < 30:
-            #     plt.title(str(i) + " " + str(round(best_model_scores[i], 4)) + " for " + str(best_models[i]))
-            # else:
-            #     plt.title(str(i) + " " + str(round(best_model_scores[i], 4)) + " for entry " + str(i))
-            # plt.show()
-
-            #>>>
 
             plt.subplots_adjust(hspace=0.2)
             plt.subplots_adjust(wspace=0.2)
-
-            #.flatten()
-            #coordinates = evolution_of_models_axes[i]
 
             if len(best_models[i].keys()) < 30:
                 eom_title = str(i) + " " + str(round(best_model_scores[i], 4)) + " for " + str(best_models[i])
@@ -847,10 +623,6 @@ if not using_catboost:
                             ax=evolution_of_models_axes[ax_index],
                             s=100).set(title=eom_title)
 
-            #<<<
-
-    #plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
-    #plt.scatter(y_test, best_model_predictions[-1])
 
     if len(best_models[i].keys()) < 30:
         eom_title = str(i) + " " + str(round(best_model_scores[-1], 4)) + " for (worst)" + str(best_models[-1])
@@ -866,9 +638,6 @@ if not using_catboost:
     plt.show()
 
 
-# In[ ]:
-
-
 if not using_catboost:
     sns.set_theme(font_scale=2, rc=None)
     sns.set_theme(font_scale=1, rc=None)
@@ -878,7 +647,6 @@ if not using_catboost:
     plt.subplots_adjust(hspace=0.2)
     plt.subplots_adjust(wspace=0.2)
 
-    #.flatten()
     coordinates = axes[0]
     sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[0], color='red')
     sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[0],
@@ -894,34 +662,12 @@ if not using_catboost:
     sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[2],
                     s=30, alpha=0.6, color='black').set(
         title='best (black) vs worst (orange)')
-    #title='best (orange) vs worst (black)')
 
     worst_and_best_model_fig.tight_layout()
     plt.show()
 
-
-# In[ ]:
-
-
-
-
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Evaluate the model
 # 
-# 
-
-# In[ ]:
-
-
-# <catboost.core.CatBoostRegressor object at 0x7fb167387490>
-# {'depth': 6}
-# defaultdict(<class 'list'>, {'iterations': [0, 1, 2],
-# 'test-RMSE-mean': [396884.9605444017, 359548.6632536235, 326027.84885587444],
-# 'test-RMSE-std': [308.9495320039113, 260.0967808594464, 219.65856329246023],
-# 'train-RMSE-mean': [396884.77936957515, 359542.3612912551, 326018.9404460669],
-# 'train-RMSE-std': [91.44140078375503, 86.77961380623475, 69.4038638987425]})
 
 cv_best_model_fit_time = cv_best_model_fit_time if not using_catboost else 999
 
@@ -950,23 +696,17 @@ if run_env not in ['colab']:
     except:
         print(f"haven't scored this model yet: {ALGORITHM}")
         old_best_score = -999
-    this_model_is_best = update_results(old_results_json, new_results, key)
+    this_model_is_best = update_results(old_results_json, new_results, key, directory=prefix_dir_results)
 
 print(key)
 new_results
 
 
-# In[ ]:
-
-
 crossval_runner.best_estimator_ if not using_catboost else ''
 
 
-# In[ ]:
-
-
 if this_model_is_best:
-    with open(f'../../../models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    with open(prefix_dir_optimised_models + f'/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         if not using_catboost:
             pickle.dump(crossval_runner.best_estimator_, f)
         else:
@@ -979,18 +719,9 @@ else:
 print(new_model_decision)
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
-# ## Stage: Investigate the feature importances (if applicable)
-# 
-
-# In[ ]:
-
-
 if model_uses_feature_importances:
     feature_importances = crossval_runner.best_estimator_[
         -1].feature_importances_ if not using_catboost else starter_model.get_feature_importance()
-    #std = np.std([tree.feature_importances_ for tree in model.estimators_], axis = 0)
 
     indices = np.argsort(feature_importances)[::-1]
 
@@ -998,7 +729,6 @@ if model_uses_feature_importances:
 
     feature_importances_output = ""
     for f in range(X_train.shape[1]):
-        #print('%d. features %d (%f)' % (f + 1, indices[f], feature_importances[indices[f]]), df_features.columns[indices[f] + 1])
         feature_importances_output += ('%d. features %d (%f)' % (f + 1, indices[f], feature_importances[indices[f]]))
         feature_importances_output += '\t\t'
         feature_importances_output += (df_features.columns[indices[f] + 1])
@@ -1006,9 +736,6 @@ if model_uses_feature_importances:
     print(feature_importances_output)
 else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
-
-
-# In[ ]:
 
 
 if model_uses_feature_importances:
@@ -1021,26 +748,14 @@ if model_uses_feature_importances:
 else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
 
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Write the final report for this algorithm and dataset version
-
-# In[ ]:
-
-
-from bs4 import BeautifulSoup
 
 
 def include_in_html_report(type, section_header=None, section_figure=None, section_content=None,
                            section_content_list=None):
-    # writePath_html = r'model_results/%s (html).html' % key
-    # writePath_md = r'model_results/%s (md).md' % key
-    results_root = '../../F_evaluate_model'
-    writePath_html = f'{results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
-    writePath_md = f'{results_root}/markdown/{key}.md'
+    writePath_html = f'{prefix_dir_results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
+    writePath_md = f'{prefix_dir_results_root}/markdown/{key}.md'
 
-    #isinstance(ini_list2, list)
     if not section_content_list:
         section_content_list = [section_content]
 
@@ -1068,46 +783,28 @@ def include_in_html_report(type, section_header=None, section_figure=None, secti
                 f2.write(dfAsString + '\n')
         elif type == 'graph':
             filename = key + "_" + section_content
-            #section_figure.savefig(f'model_results/artifacts/{filename.replace(" ", "_")}')
             section_figure.savefig(
-                f'{results_root}/artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}')
+                f'{prefix_dir_results_root}/artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}')
 
             with open(writePath_html, 'a') as f1:
                 dfAsString = f'<img src="../artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}"/>'
                 f1.write(dfAsString)
 
             with open(writePath_md, 'a') as f2:
-                #dfAsString = f'(./model_results/artifacts/{filename}) \n'
-                #dfAsString = f'![detail](./artifacts/{filename.replace(" ","_")})'
                 dfAsString = f'![detail](../artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")})'
                 f2.write(dfAsString)
                 f2.write('\n')
         elif type == 'json':
-
-            # html_content_parsed = [[cell.text for cell in row("td")]
-            #              for row in BeautifulSoup(content,features="html.parser")("tr")]
-            #
-            # html_content_dictionary = {element[0]:element[1:] for element in html_content_parsed}
-
-            #xxxprint(json.dumps(html_content_dictionary, indent=4))
 
             with open(writePath_html, 'a') as f1:
                 #f.write(json.dumps(html_content_dictionary, indent=4))
                 soup = BeautifulSoup(section_content, "html.parser")
                 f1.write(str(soup.prettify()))
             with open(writePath_md, 'a') as f2:
-                #f.write(json.dumps(html_content_dictionary, indent=4))
                 soup = BeautifulSoup(section_content, "html.parser")
-                #f2.write(str(soup.prettify()))
 
-                # html_content_dictionary = {element[0]:element[1:] for element in html_content_parsed}
-                # f2.write(json.dumps(html_content_dictionary, indent=4))
-
-                import ast
                 loads = ast.literal_eval(section_content)
-                #df = pd.DataFrame.from_dict(loads)
-                #df.drop(['dont'], axis=1, inplace=True)
-                #print(df.to_markdown(index=False,tablefmt='fancy_grid'))
+
                 for each in loads:
                     f2.write(each + " = " + str(loads[each]) + "\n\n")
 
@@ -1151,8 +848,6 @@ include_in_html_report("header", section_content=f"Results", section_figure=2)
 
 include_in_html_report(type="text", section_header="Summary", section_content=new_model_decision)
 
-#include_in_html_report(type="dataframe",text_single="Tuned Models ranked by performance", content=cv_results_df_sorted)
-
 if not using_catboost:
     include_in_html_report(type='dataframe',
                            section_header='Tuned Models ranked by performance, with parameter details',
@@ -1179,7 +874,7 @@ if model_uses_feature_importances:
 
 include_in_html_report("header", section_content=f"Comparison with other models", section_figure=2)
 
-dff = pd.read_json('../../../results/results.json')
+dff = pd.read_json(prefix_dir_results + '/results.json')
 
 version = VERSION
 
@@ -1219,31 +914,11 @@ def print_and_report(text_single, title):
         print(each)
         include_in_html_report("text", section_header="", section_content=each)
 
-# if not catboost:
-#     print_and_report([
-#         'Best Index:' + str(crossval_runner.best_index_) + '<br>',
-#         'Best Score:' + str(crossval_runner.best_score_) + '<br>',
-#         'Best Params: ' + str(crossval_runner.best_params_) + '<br>'
-#     ], "Best Model Details")
-
-
-
-# In[ ]:
-
-
 print('Nearly finished...')
-
-
-# In[ ]:
 
 
 if create_python_script and is_jupyter:
     filename = FILENAME+'.ipynb'
-    get_ipython().system('jupyter nbconvert --to script $filename')
-
-
-# In[ ]:
-
 
 print(f'ALGORITHM: {ALGORITHM}')
 print(f'ALGORITHM_DETAIL: {ALGORITHM_DETAIL}')
@@ -1258,10 +933,6 @@ print(f'Start Timestamp: {start}')
 print(f'End Timestamp: {datetime.now()}')
 
 print(f'FILENAME: {FILENAME}')
-
-
-# In[ ]:
-
 
 print('Finished!')
 

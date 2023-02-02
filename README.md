@@ -52,6 +52,17 @@ I ultimately decided that I would obtain feature data using a popular estate age
 
 Download this repository and ensure you have the dependencies listed in [requirements.txt](requirements.txt).
 
+Either rename **_envs_sample.json** to **_envs.json** (to use the run parameters that I used), or create your own version of _envs.json which you can customize to maximise performance/speed/debuggability, or adjust for the platform you're using (local machine or cloud resources).
+<br><br> The **_envs.json** file uses the following parameters:
+- "notebook_environment": "local" or "gradient" or "cloud"
+- "use_gpu": false/true
+- "debug_mode": false/true
+- "quick_mode": false/true
+- "quick_override_cv_splits": INTEGER
+- "quick_override_n_iter": INTEGER
+- "quick_override_n_jobs": INTEGER
+
+
 Run the relevant python script for the model you wish to train: <br>
 * Train a standard model: <br>`python process/E_train_model/all_models_except_neural_networks.py` <br><br>
 * Train a neural network: <br>`python process/E_train_model/neural_networks_model.py`<br><br>

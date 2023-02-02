@@ -16,24 +16,6 @@
 import sys
 import os
 
-#prefix_dir_envs = '../../z_envs/'
-#prefix_dir_hyperparameters = '../../../'
-#prefix_functions_root = os.path.join('..', '..', '..')
-
-# prefix_dir_envs = '../z_envs/'
-# prefix_dir_hyperparameters = '../../'
-# prefix_dir_results = '../F_evaluate_model'
-# prefix_dir_optimised_models = '../../../models/'
-# prefix_functions_root = os.path.join('..', '..')
-#prefix_dir_results_root = '../../F_evaluate_model'
-
-prefix_dir_envs = './process/z_envs/'
-prefix_dir_hyperparameters = './'
-prefix_dir_results = './process/F_evaluate_model/'
-prefix_dir_optimised_models = './models/'
-prefix_functions_root = os.path.join('.')
-prefix_dir_results_root = './process/F_evaluate_model'
-
 FILENAME = 'all_models_except_neural_networks'
 
 ALGORITHM = 'Linear Regression (Ridge)'
@@ -65,6 +47,13 @@ print(f'DATA_DETAIL: {DATA_DETAIL}')
 
 model_uses_feature_importances = 'tree' in ALGORITHM.lower() or 'forest' in ALGORITHM.lower() or 'boost' in ALGORITHM.lower()
 create_python_script = True
+
+prefix_dir_envs = './process/z_envs/'
+prefix_dir_hyperparameters = './'
+prefix_dir_results = './process/F_evaluate_model/'
+prefix_dir_optimised_models = './models/'
+prefix_functions_root = os.path.join('.')
+prefix_dir_results_root = './process/F_evaluate_model'
 
 
 
