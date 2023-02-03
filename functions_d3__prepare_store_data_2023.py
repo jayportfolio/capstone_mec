@@ -63,6 +63,7 @@ def convert_to_dummied(df, categories):
 
 
 def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_webapp_run=False, versioned=False):
+    print('getting test data for version', VERSION)
     suffix = "_no_nulls" if drop_nulls else ""
 
     try:
@@ -87,7 +88,8 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
         # features = df[FEATURES].values
         # labels = df[LABEL].values
         # X_train, X_test, y_train, y_test = train_test_split(features, labels, train_size=0.9, random_state=RANDOM_STATE)
-        X_train, X_test, y_train, y_test = tt_split(VERSION, df)
+        X_train, X_test, y_train, y_test, feature_names = tt_split(VERSION, df)
+        print("feature_names", "feature_names")
 
         print('test_data_only', test_data_only)
         print('drop_nulls', drop_nulls)
@@ -115,20 +117,29 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
     if not test_data_only:
         return X_train, X_test, y_train, y_test
 
-    return X_test, y_test
+    return X_test, y_test, feature_names
 
 
 def tt_split(VERSION, df, RANDOM_STATE=101, LABEL='Price'):
+    debug_mode=False
+
     columns, booleans, floats, categories, custom, wildcard = get_columns(version=VERSION)
 
     for column in categories:
         df = pd.concat([df, pd.get_dummies(df[column], prefix=column)], axis=1)
         df.drop([column], axis=1, inplace=True)  # now drop the original column (you don't need it anymore),
+        if debug_mode:print("updated df!!!")
+        if debug_mode:print(df.head(1))
+        if debug_mode:print("df.columns[1:]", df.columns[1:])
+        returnable_columns = df.columns[1:]
+        if debug_mode:print("returnable_columns", returnable_columns)
 
     # features = df[df.columns[:-1]].values
     features = df[df.columns[1:]].values
     # features = df[FEATURES].values
     labels = df[LABEL].values
     X_train, X_test, y_train, y_test = train_test_split(features, labels, train_size=0.9, random_state=RANDOM_STATE)
-    return X_train, X_test, y_train, y_test
+
+    if debug_mode:print("returnable_columns", returnable_columns)
+    return X_train, X_test, y_train, y_test, returnable_columns
 
