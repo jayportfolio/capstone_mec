@@ -14,7 +14,6 @@ class Test(TestCase):
     # 'optimised_model_Neural Network_v06',
     # 'optimised_model_XG Boost_v06'
 
-    aa = {'a':111}
     def test_main2(self):
         selected_model = 'abc'
 

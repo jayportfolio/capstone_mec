@@ -15,6 +15,22 @@ DEFAULT_MODEL = 'Decision Tree'
 DATA_VERSION = None
 previous_data_version = DATA_VERSION
 
+prediction_models = {
+    'XG Boost (data version 11) - Best model': 'optimised_model_XG Boost (tree)_v11',
+    'XG Boost (data version 9) - Good model': 'optimised_model_XG Boost (tree)_v10',
+    'KNN (data version 6) - Fastest to train, Good model': 'optimised_model_KNN_v06',
+    'Catboost (data version 6)': 'optimised_model_CatBoost_v06',
+    'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
+    'Random Forests (data version 9) - Fair model': 'optimised_model_Random Forest_v09',
+    'Neural Network (data version 11) - Fair model': 'optimised_model_Neural Network_v11',
+    'Linear Regression (data version 11) - Poor model': 'optimised_model_Linear Regression (Ridge)_v11',
+    'Linear Regression (data version 6) - Poor model': 'optimised_model_Linear Regression (Ridge)_v06',
+}
+#    ' (data version )': '',
+
+
+#optimised_model_CatBoost_v10(no dummies)
+
 
 def main():
     global X_test, y_test, rand_index, DATA_VERSION, previous_data_version
@@ -66,23 +82,10 @@ def main():
                 print("File does not exist:", deletable_file)
             # Showing the message instead of throwig an error
 
-    available_models = [
-        'optimised_model_Decision Tree_v06',
-        'optimised_model_CatBoost_v06',
-        'optimised_model_KNN_v06',
-        'optimised_model_KNN_v11',
-        'optimised_model_Linear Regression (Ridge)_v06',
-        #'optimised_model_Neural Network_v06',
-        'optimised_model_Neural Network_v11',
-        'optimised_model_XG Boost_v06',
-        'optimised_model_XG Boost (tree)_v11',
-        # 'Decision Tree',
-        # 'Linear Regression',
-        # 'Deep Neural Network',
-        # 'Linear Regression (Keras)',
-        # 'HistGradientBoostingRegressor'
-    ]
-    selected_model = st.selectbox('Which model do you want to use?', available_models)
+    available_models = prediction_models.keys()
+
+    selected_model_key = st.selectbox('Which model do you want to use?', available_models)
+    selected_model = prediction_models[selected_model_key]
 
     try:
         #model_path = f'models_pretrained/{selected_model}.pkl'
@@ -91,13 +94,14 @@ def main():
         model = load_standard_model(selected_model=selected_model, model_type='neural' if 'eural' in selected_model else 'standard')
         DATA_VERSION = selected_model[-2:]
         if DATA_VERSION != previous_data_version:
-            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
+            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
             previous_data_version = DATA_VERSION
     except:
         #raise ValueError(f'failed to load model: {model_path}')
         raise ValueError(f'failed to load model: {selected_model}')
 
-    manual_parameters = st.checkbox('Use manual parameters instead of sample')
+    #manual_parameters = st.checkbox('Use manual parameters instead of sample')
+    manual_parameters = False
     if not manual_parameters:
 
         test_size = len(y_test)
@@ -124,11 +128,21 @@ def main():
                 inputs = [random_instance_plus[2:]]
                 print([random_instance_plus[2:]])
             except:
-                print("----- VALUEERROR -----")
                 rand_index = random.randint(0, test_size - 1)
 
                 DATA_VERSION = selected_model[-2:]
-                X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
+                X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
+
+                print("")
+                print("")
+                print("")
+                print("")
+                print("DATA_VERSION:", DATA_VERSION)
+                print("X_test:", X_test[0:1])
+                print("")
+                print("")
+                print("")
+
                 previous_data_version = DATA_VERSION
 
                 inputs = [X_test[rand_index]]
@@ -139,19 +153,19 @@ def main():
                 random_instance_plus.extend(random_instance[0])
                 np.savetxt("random_instance_plus.csv", random_instance_plus, delimiter=",")
 
-            st.text(f'Actual value of property {rand_index}: {expected}')
+            #st.text(f'Actual value of property {rand_index}: {expected}')
 
         print("inputs:", inputs)
 
         result = model.predict(inputs)
         updated_res = result.flatten().astype(float)
-        st.success('The predicted price for this property is £ {}'.format(updated_res[0]))
+        st.success('The predicted price for this property is £ {:.2f}'.format(updated_res[0]))
         st.warning('The actual price for this property is £ {}'.format(expected))
 
 
     if st.checkbox('Get multiple predictions (entire test set)'):
         DATA_VERSION = selected_model[-2:]
-        X_train, X_test, y_train, y_test = this_test_data(VERSION=DATA_VERSION)
+        X_train, X_test, y_train, y_test = this_test_data(VERSION=DATA_VERSION, versioned=True)
         acc = model.score(X_test, y_test)
         st.write('Accuracy of test set: ', acc)
 
@@ -163,7 +177,7 @@ def main():
     if not manual_parameters:
         if st.button('Get a different random property!'):
             rand_index = random.randint(0, test_size - 1)
-            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
+            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
             inputs = [X_test[rand_index]]
 
             random_instance = inputs
