@@ -165,7 +165,7 @@ def main():
 
     if st.checkbox('Get multiple predictions (entire test set)'):
         DATA_VERSION = selected_model[-2:]
-        X_train, X_test, y_train, y_test = this_test_data(VERSION=DATA_VERSION, versioned=True)
+        X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
         acc = model.score(X_test, y_test)
         st.write('Accuracy of test set: ', acc)
 

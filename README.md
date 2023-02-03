@@ -90,8 +90,9 @@ You can compare the respective results from the various models trained in this f
 ### Running the WebApp
 #### Running the WebApp Remotely
 
-You can access the running demo of the webapp at:
-https://jayportfolio-webapp-capstone-app-0526gb.streamlit.app/
+You can access the running demo of the webapp at:<br>
+https://jayportfolio-capstone-mec-app-mmr0fa.streamlit.app/
+<br>(legacy version: https://jayportfolio-capstone-mec-app-mmr0fa.streamlit.app/)
 
 #### Running the WebApp Locally
 
