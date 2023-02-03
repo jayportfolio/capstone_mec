@@ -3,11 +3,10 @@ pandas
 scikit-learn
 streamlit
 
-xgboost
+xgboost ==1.6.1 # downgraded from latest 1.7.3
 scikeras
 catboost
 
-#pytest
 #pytest-cov
 tabulate
 termcolor
@@ -16,6 +15,9 @@ beautifulsoup4
 # Was temporarily removed for heroku slug (but restored since using Streamlit and is required)
 seaborn #==0.11.2
 tensorflow-cpu
+
+# Newly added
+pytest
 
 # Temporarily remove for heroku slug
 #jupyter #==1.0.0

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Decide which algorithm and version of the data we are going to use for model training
 # (it'll be neural network in this file)
 # 
@@ -11,9 +9,6 @@
 # * if we'll use full categories instead of dummies
 # * what fraction of the data we'll use for testing (0.1)
 # * if the data split will be randomised (it won't!)
-
-# In[55]:
-
 
 FILENAME = 'neural_networks_model'
 
@@ -27,6 +22,8 @@ DATA_DETAIL = []
 VERSION = '11'
 
 import os
+#prefix_dir_data = '../../../'
+prefix_dir_data = './'
 prefix_dir_envs = './process/z_envs/'
 prefix_dir_hyperparameters = './'
 prefix_dir_results = './process/F_evaluate_model/'
@@ -94,30 +91,14 @@ ALGORITHM = ALGORITHM.replace("[TYPE]", selected_nn_code)
 
 create_python_script = True
 
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: loading all dependencies
 # 
-# 
-
-# In[56]:
-
-
 import os
 
 if "JPY_PARENT_PID" in os.environ:
     is_jupyter = True
 else:
     is_jupyter = False
-
-
-if is_jupyter:
-    #! pip install scikeras
-    get_ipython().system('pip install tabulate')
-
-
-# In[57]:
 
 
 from sklearn.impute import SimpleImputer
@@ -138,6 +119,7 @@ from datetime import datetime
 import json
 import matplotlib.pyplot as plt
 import sys
+from bs4 import BeautifulSoup
 
 start_timestamp = datetime.now()
 
@@ -181,17 +163,17 @@ if module_path not in sys.path:
 
 if run_env not in ['colab', 'gradient', 'cloud']:
     cloud_run = False
-    from functions_b__get_the_data_20221116 import set_csv_directory
+    from functions_b__get_the_data_2023 import set_csv_directory
     set_csv_directory('final_split')
 else:
     cloud_run = True
 
 from functions_0__common_20221116 import get_columns
-from functions_b__get_the_data_20221116 import get_combined_dataset, get_source_dataframe
+from functions_b__get_the_data_2023 import get_combined_dataset, get_source_dataframe
 from functions_d1__prepare_cleanse_data_20221116 import tidy_dataset
 from functions_d2__transform_enrich_data_20221116 import preprocess, feature_engineer
-from functions_d3__prepare_store_data_20221116 import create_train_test_data
-from functions_e__train_model_20221116 import get_chosen_model, make_modelling_pipeline, get_cv_params, fit_model_with_cross_validation, get_hyperparameters
+from functions_d3__prepare_store_data_2023 import create_train_test_data
+from functions_e__train_model_2023 import get_chosen_model, make_modelling_pipeline, get_cv_params, fit_model_with_cross_validation, get_hyperparameters
 from functions_f_evaluate_model_20221116 import get_best_estimator_average_time, get_results, update_results
 
 print(env_vars)
@@ -200,10 +182,6 @@ start = datetime.now()
 
 # #### Include any overrides specific to the algorthm / python environment being used
 
-# In[58]:
-
-
-#running_locally = True
 running_locally = run_env == 'local'
 
 
@@ -211,10 +189,6 @@ running_locally = run_env == 'local'
 # 
 # ## Stage: creating the ANN model
 # 
-# 
-
-# In[59]:
-
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -524,7 +498,7 @@ def make_simple_ann(key, inputs=-1):
         raise ValueError("make_simple_ann: no entry for key:", key)
 
     if running_locally:
-        epochs = 8
+        epochs = 3
 
     # Compile the network :
     chosen_model.compile(
@@ -538,25 +512,12 @@ def make_simple_ann(key, inputs=-1):
 
     return chosen_model, new_algorithm_detail, epochs, {'learning_rate':learn_rate}
 
-#make_simple_ann('m04 four layers,wider,batchnorm')
-
-
 # <code style="background:blue;color:blue">**********************************************************************************************************</code>
 # 
-# ## Stage: get the data
-# 
-
-# In[60]:
-
-
 columns, booleans, floats, categories, custom, wildcard = get_columns(version=VERSION)
 LABEL = 'Price'
 
-
-# In[61]:
-
-
-df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
+df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix=prefix_dir_data, row_limit=None)
 df_orig = df.copy()
 
 if retrieval_type != 'tidy':
@@ -567,31 +528,16 @@ if retrieval_type != 'tidy':
     df = df[columns]
 
 
-# In[62]:
-
-
 print(colored(f"features", "blue"), "-> ", columns)
 columns.insert(0, LABEL)
 print(colored(f"label", "green", None, ['bold']), "-> ", LABEL)
 
-
-# In[63]:
-
-
 df = preprocess(df, version=VERSION)
 df = df.dropna()
-
-
-# In[64]:
-
 
 df['Price'] = df['Price'] / price_divisor # potentially making the price smaller to make the ANN perform better
 
 df.head(30)
-
-
-# In[65]:
-
 
 X_train, X_test, y_train, y_test, X_train_index, X_test_index, y_train_index, y_test_index, df_features, df_labels = create_train_test_data(
     df,
@@ -608,16 +554,8 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape, X_train_index.sh
 
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
+#
 # ## Stage:
-# * #### retrieve the hyperparameters for this model, and
-# * #### train the model
-# 
-# 
-
-# In[66]:
-
 
 trainable_model, ALGORITHM_DETAIL, chosen_epochs, chosen_params = make_simple_ann(selected_neural_network)
 
@@ -625,15 +563,8 @@ if quick_mode: chosen_epochs=5
 ALGORITHM_DETAIL
 
 
-# In[67]:
-
-
 print("selected_neural_network",selected_neural_network)
 trainable_model.summary()
-
-
-# In[68]:
-
 
 val_split = 0.1
 min_delta=0 #10, #50, #10, #50,
@@ -666,20 +597,8 @@ pipe_end = time()
 estimated_time = round((pipe_end - pipe_start), 2)
 
 
-# In[69]:
-
-
-#ALGORITHM_DETAIL.replace("epochs=", f"epochs={len(hist)}/")
-
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Get the results and print some graphs
 # 
-# 
-
-# In[70]:
-
 
 hist = pd.DataFrame(history.history)
 hist['epoch'] = history.epoch
@@ -712,20 +631,6 @@ print(ALGORITHM_DETAIL)
 hist.tail()
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
 
 def plot_loss(history):
     loss_fig, loss_ax = plt.subplots()
@@ -751,15 +656,7 @@ def plot_loss(history):
 
 loss_fig, loss_ax = plot_loss(history)
 
-
-# In[ ]:
-
-
 y_pred = trainable_model.predict(X_test)
-
-
-# In[ ]:
-
 
 y_pred = y_pred.reshape((-1, 1))
 
@@ -773,10 +670,6 @@ print('Mean Absolute Error Accuracy', MAE)
 print('Mean Squared Error Accuracy', MSE)
 print('Root Mean Squared Error', RMSE)
 
-
-# In[ ]:
-
-
 if debug_mode:
     print(y_test_index.reshape((-1, 1)).shape);
     print(y_pred.reshape((-1, 1)).shape);
@@ -784,10 +677,6 @@ if debug_mode:
     print(y_test_index.shape);
     print(y_pred.shape);
     print(y_test.shape)
-
-
-# In[ ]:
-
 
 compare = np.hstack((y_test_index, y_test, y_pred))
 compare_df = DataFrame(compare, columns=['reference', 'actual', 'predicted'])
@@ -806,9 +695,6 @@ combined['bedrooms'] = combined['bedrooms'].astype(int)
 combined
 
 
-# In[ ]:
-
-
 best_model_fig, best_model_ax = plt.subplots()
 best_model_ax.scatter(y_test, y_pred, edgecolors=(0, 0, 1))
 best_model_ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
@@ -818,16 +704,9 @@ best_model_ax.set_xlabel('Actual')
 
 plt.show()
 
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Evaluate the model
 # 
 # 
-
-# In[ ]:
-
-
 cv_best_model_fit_time = estimated_time
 
 DD2 = "(" + ",".join(DATA_DETAIL) + ")" if len(DATA_DETAIL) >= 1 else ""
@@ -864,14 +743,11 @@ if run_env not in ['colab']:
 print(key)
 print(ALGORITHM_DETAIL)
 
-
-# In[ ]:
-
-
 latest_score = old_results_json[key]['_score']
 
+latest_score = 60
 if this_model_is_best and latest_score > 0.55:
-    with open(f'../../../models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    with open(prefix_dir_optimised_models + f'optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         pickle.dump(trainable_model, f)
         new_model_decision = f"pickled new version of model\n{latest_score} is new best score (it's better than {old_best_score})"
         #print(results_json[key]['_score'], 'is an improvement on', results_json[key]['second best score'])
@@ -882,15 +758,7 @@ else:
 
 print(new_model_decision)
 
-
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
-# 
 # ## Stage: Write the final report for this algorithm and dataset version
-
-# In[ ]:
-
-
-from bs4 import BeautifulSoup
 
 
 def include_in_html_report(type, section_header=None, section_figure=None, section_content=None, section_content_list=None):
@@ -898,7 +766,6 @@ def include_in_html_report(type, section_header=None, section_figure=None, secti
     writePath_html = f'{prefix_dir_results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
     writePath_md = f'{prefix_dir_results_root}/markdown/{key}.md'
 
-#isinstance(ini_list2, list)
     if not section_content_list:
         section_content_list = [section_content]
 
@@ -940,15 +807,6 @@ def include_in_html_report(type, section_header=None, section_figure=None, secti
                 f2.write(dfAsString)
                 f2.write('\n\n')
         elif type=='json':
-
-            # html_content_parsed = [[cell.text for cell in row("td")]
-            #              for row in BeautifulSoup(content,features="html.parser")("tr")]
-            #
-            # html_content_dictionary = {element[0]:element[1:] for element in html_content_parsed}
-
-            #xxxprint(json.dumps(html_content_dictionary, indent=4))
-
-
 
             with open(writePath_html, 'a') as f1:
                 #f.write(json.dumps(html_content_dictionary, indent=4))
@@ -1081,31 +939,11 @@ def print_and_report(text_single, title):
         print(each)
         include_in_html_report("text", section_header="", section_content=each)
 
-# if not catboost:
-#     print_and_report([
-#         'Best Index:' + str(crossval_runner.best_index_) + '<br>',
-#         'Best Score:' + str(crossval_runner.best_score_) + '<br>',
-#         'Best Params: ' + str(crossval_runner.best_params_) + '<br>'
-#     ], "Best Model Details")
-
-
-
-# In[ ]:
-
-
 print('Nearly finished...')
-
-
-# In[ ]:
-
 
 if create_python_script and is_jupyter:
     filename = FILENAME+'.ipynb'
     get_ipython().system('jupyter nbconvert --to script $filename')
-
-
-# In[ ]:
-
 
 print(f'ALGORITHM: {ALGORITHM}')
 print(f'ALGORITHM_DETAIL: {ALGORITHM_DETAIL}')
@@ -1117,10 +955,6 @@ print(f'Start Timestamp: {start}')
 print(f'End Timestamp: {datetime.now()}')
 
 print(f'FILENAME: {FILENAME}')
-
-
-# In[ ]:
-
 
 print('Finished!')
 

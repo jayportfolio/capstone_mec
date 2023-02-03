@@ -41,10 +41,10 @@ I ultimately decided that I would obtain feature data using a popular estate age
 ##### More information wrangling and cleaning my data: <br>[05__data_wrangling.md](capstone_steps%2Fstep_05%2F05__data_wrangling.md)
 
 ### Samples of my datasets
-* [Basic listings data](data%2Flistings_data_basic_sample.csv)
-* [Detailed Listing data](data%2Flistings_data_enriched_sample.csv)
-* [Website datalayer model object data (standard)](data%2Flistings_data_jsonmeta_sample.csv)
-* [Website datalayer model object data (metadata)](data%2Flistings_data_jsonmodel_sample.csv)
+* [Basic listings data](data%2Fsample%2Flistings_data_basic_sample.csv)
+* [Detailed Listing data](data%2Fsample%2Flistings_data_enriched_sample.csv)
+* [Website datalayer model object data (standard)](data%2Fsample%2Flistings_data_jsonmeta_sample.csv)
+* [Website datalayer model object data (metadata)](data%2Fsample%2Flistings_data_jsonmodel_sample.csv)
 
 
 

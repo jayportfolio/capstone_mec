@@ -1,13 +1,10 @@
-import random
-
 import pandas as pd
 import streamlit as st
-import pickle
-
-from functions_b__get_the_data_20221116 import get_source_dataframe
-from functions_d3__prepare_store_data_20221116 import this_test_data
-
 import numpy as np
+import random
+
+from functions_b__get_the_data_2023 import get_source_dataframe
+from functions_d3__prepare_store_data_2023 import this_test_data
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -15,12 +12,13 @@ df, X_test, y_test = None, None, None
 rand_index = -1
 
 DEFAULT_MODEL = 'Decision Tree'
-DATA_VERSION = '06'
+DATA_VERSION = None
+previous_data_version = DATA_VERSION
 
 
 def main():
-    global X_test, y_test, rand_index
-    fake_being_in_colab = True
+    global X_test, y_test, rand_index, DATA_VERSION, previous_data_version
+    fake_being_cloud_or_webapp_run = True
 
     st.markdown(
         "<h1 style='text-align: center; color: White;background-color:#e84343'>London Property Prices Predictor</h1>",
@@ -72,9 +70,12 @@ def main():
         'optimised_model_Decision Tree_v06',
         'optimised_model_CatBoost_v06',
         'optimised_model_KNN_v06',
+        'optimised_model_KNN_v11',
         'optimised_model_Linear Regression (Ridge)_v06',
-        'optimised_model_Neural Network_v06',
+        #'optimised_model_Neural Network_v06',
+        'optimised_model_Neural Network_v11',
         'optimised_model_XG Boost_v06',
+        'optimised_model_XG Boost (tree)_v11',
         # 'Decision Tree',
         # 'Linear Regression',
         # 'Deep Neural Network',
@@ -84,14 +85,20 @@ def main():
     selected_model = st.selectbox('Which model do you want to use?', available_models)
 
     try:
-        model_path = f'models_pretrained/{selected_model}.pkl'
-        model = pickle.load(open(model_path, 'rb'))
+        #model_path = f'models_pretrained/{selected_model}.pkl'
+        #model = pickle.load(open(model_path, 'rb'))
+        from functions_gh_presentation_and_launch import load_standard_model
+        model = load_standard_model(selected_model=selected_model, model_type='neural' if 'eural' in selected_model else 'standard')
+        DATA_VERSION = selected_model[-2:]
+        if DATA_VERSION != previous_data_version:
+            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
+            previous_data_version = DATA_VERSION
     except:
-        raise ValueError(f'no model: {model_path}')
+        #raise ValueError(f'failed to load model: {model_path}')
+        raise ValueError(f'failed to load model: {selected_model}')
 
     manual_parameters = st.checkbox('Use manual parameters instead of sample')
     if not manual_parameters:
-        X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, IN_COLAB=fake_being_in_colab)
 
         test_size = len(y_test)
 
@@ -107,6 +114,7 @@ def main():
 
         if not manual_parameters:
             try:
+                raise InterruptedError("don't ever do this actually")
                 random_instance_plus = np.loadtxt("random_instance_plus.csv", delimiter=",")
                 print(random_instance_plus)
                 rand_index = int(random_instance_plus[0])
@@ -118,6 +126,11 @@ def main():
             except:
                 print("----- VALUEERROR -----")
                 rand_index = random.randint(0, test_size - 1)
+
+                DATA_VERSION = selected_model[-2:]
+                X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
+                previous_data_version = DATA_VERSION
+
                 inputs = [X_test[rand_index]]
                 random_instance = inputs
                 expected = y_test[rand_index]
@@ -137,6 +150,7 @@ def main():
 
 
     if st.checkbox('Get multiple predictions (entire test set)'):
+        DATA_VERSION = selected_model[-2:]
         X_train, X_test, y_train, y_test = this_test_data(VERSION=DATA_VERSION)
         acc = model.score(X_test, y_test)
         st.write('Accuracy of test set: ', acc)
@@ -149,6 +163,7 @@ def main():
     if not manual_parameters:
         if st.button('Get a different random property!'):
             rand_index = random.randint(0, test_size - 1)
+            X_test, y_test = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True)
             inputs = [X_test[rand_index]]
 
             random_instance = inputs
@@ -164,7 +179,8 @@ def main():
             np.savetxt("random_instance_plus.csv", [random_instance_plus], delimiter=",")
 
     if st.checkbox('Show the underlying dataframe'):
-        df, df_type = get_source_dataframe(cloud_run=fake_being_in_colab, VERSION=DATA_VERSION, folder_prefix='')
+        DATA_VERSION = selected_model[-2:]
+        df, df_type = get_source_dataframe(cloud_or_webapp_run=True, version=DATA_VERSION, folder_prefix='')
         print("claiming to be colab so I can use the cloud version of data and save space")
         st.write(df)
 
