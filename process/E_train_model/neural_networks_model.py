@@ -19,7 +19,7 @@ ALGORITHM_DETAIL_ORIG = ALGORITHM_DETAIL
 # ALGORITHM_DETAIL += ' tbc'
 DATA_DETAIL = []
 # DATA_DETAIL = ['no scale','no dummies']
-VERSION = '06'
+VERSION = '09'
 
 import os
 
@@ -71,7 +71,7 @@ price_divisor = 1
 # selected_neural_network = selected_nn_code = ""
 
 # ---- 7th NEURAL NETWORK STRUCTURE DEFINITION ---- #
-selected_neural_network = selected_nn_code = "m11 mega"
+#selected_neural_network = selected_nn_code = "m11 mega"
 
 # ---- 8th NEURAL NETWORK STRUCTURE DEFINITION ---- #
 # selected_neural_network = selected_nn_code = "m12 mega"
@@ -83,7 +83,7 @@ selected_neural_network = selected_nn_code = "m11 mega"
 # selected_neural_network = selected_nn_code = "m14 mega"
 
 # ---- 10th NEURAL NETWORK STRUCTURE DEFINITION ---- #
-#selected_neural_network = selected_nn_code = "m15 mega + dropout"
+selected_neural_network = selected_nn_code = "m15 mega + dropout"
 
 ALGORITHM = ALGORITHM.replace("[TYPE]", selected_nn_code)
 
