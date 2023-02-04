@@ -725,7 +725,6 @@ print(ALGORITHM_DETAIL)
 
 latest_score = old_results_json[key]['_score']
 
-latest_score = 60
 if this_model_is_best and latest_score > 0.55:
     #with open(prefix_dir_optimised_models + f'optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         # pickle.dump(trainable_model, f)
