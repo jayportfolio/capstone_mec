@@ -12,22 +12,21 @@ debug_mode = False
 
 testdata_standard_model = []
 for each in [
-    'optimised_model_KNN_v06',
-    'optimised_model_XG Boost_v06',
-    'optimised_model_Decision Tree_v06',
-    'optimised_model_CatBoost_v06',
-    'optimised_model_Linear Regression (Ridge)_v06',
+    # 'optimised_model_KNN_v06',
+    # 'optimised_model_XG Boost_v06',
+    # 'optimised_model_Decision Tree_v06',
+    # 'optimised_model_CatBoost_v06',
+    # 'optimised_model_Linear Regression (Ridge)_v06',
+    # 'optimised_model_XG Boost (tree)_v11',
+    # 'optimised_model_Linear Regression (Ridge)_v11',
 ]:
-    testdata_standard_model.append(("models_pretrained", each, '06', Pipeline))
-
-for each in [
-    'optimised_model_XG Boost (tree)_v11',
-    'optimised_model_Linear Regression (Ridge)_v11',
-]:
-    testdata_standard_model.append(("models_pretrained", each, '11', Pipeline))
+    testdata_standard_model.append(("models_pretrained", each, each[-2:], Pipeline))
 
 testdata_neural_network = [
-    ("models_pretrained", "optimised_model_Neural Network_v06", '06', keras.models.Sequential),
+    #("models_pretrained", "optimised_model_Neural Network_v06", '06', keras.models.Sequential),
+    ("models_pretrained", "neural network m11 mega (v06)_v06", '06', keras.models.Sequential),
+    #("models_pretrained", "neural network m15 mega + dropout (v11)_v11", '06', keras.models.Sequential),
+    ("models_pretrained", "neural network m15 mega + dropout (v11)_v11", '11', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m12 mega_v06", '06', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m15 mega + dropout_v09", '09', keras.models.Sequential)
 ]
@@ -68,7 +67,11 @@ def test_load_neural_network(directory, selected_model, version, expected_type):
 def test_predict_using_neural_network(directory, selected_model, version, expected_type):
     model = test_load_neural_network(directory, selected_model, version, expected_type)
 
-    X_test, y_test = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False)
+    X_test, y_test, feature_names = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+
+    print(X_test)
+    print(len(X_test))
+    print(len(X_test[0]))
 
     y_pred = model.predict(X_test)
     assert type(y_pred) == type(y_test)

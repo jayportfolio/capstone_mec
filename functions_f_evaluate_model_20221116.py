@@ -3,6 +3,7 @@ import pandas as pd
 from time import time
 from datetime import datetime
 import json
+from bs4 import BeautifulSoup
 
 
 def make_result(score, time, method, vary=""):
@@ -355,6 +356,105 @@ def test_module():
         get_hyperparameters('catboost', False)
     else:
         pass
+
+def include_in_html_report(type, section_header=None, section_figure=None, section_content=None, section_content_list=None, prefix="???????pref", key="???????key"):
+
+    writePath_html = f'{prefix}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
+    writePath_md = f'{prefix}/markdown/{key}.md'
+
+    if not section_content_list:
+        section_content_list = [section_content]
+
+    if type == 'header':
+        w = 'w' if section_figure <= 1 else 'a'
+        with open(writePath_html, w) as f1:
+            headers = f'<h{section_figure}>{section_content}</h{section_figure}>'
+            f1.write(headers)
+        with open(writePath_md, w) as f2:
+            headers = f'{"#" * int(section_figure)} {section_content }\n'
+            f2.write(headers)
+    else:
+        if section_header:
+            with open(writePath_html, 'a') as f1:
+                f1.write(f'<h3>{section_header}</h3>')
+            with open(writePath_md, 'a') as f2:
+                f2.write(f'### {section_header}\n')
+
+        if type=='dataframe':
+            with open(writePath_html, 'a') as f1:
+                dfAsString = section_content.to_html()
+                f1.write(dfAsString)
+            with open(writePath_md, 'a') as f2:
+                dfAsString = section_content.to_markdown()
+                f2.write(dfAsString + '\n\n')
+        elif type=='graph':
+            filename = key + "_" + section_content
+            #section_figure.savefig(f'model_results/artifacts/{filename.replace(" ", "_")}')
+            section_figure.savefig(f'{prefix}/artifacts/{filename.replace(" ", "_").replace("(", "_").replace(")", "_")}')
+
+            with open(writePath_html, 'a') as f1:
+                dfAsString = f'<img src="../artifacts/{filename.replace(" ","_").replace("(", "_").replace(")", "_")}"/>'
+                f1.write(dfAsString)
+
+            with open(writePath_md, 'a') as f2:
+                #dfAsString = f'(./model_results/artifacts/{filename}) \n'
+                #dfAsString = f'![detail](./artifacts/{filename.replace(" ","_")})'
+                dfAsString = f'![detail](../artifacts/{filename.replace(" ","_").replace("(", "_").replace(")", "_")})'
+                f2.write(dfAsString)
+                f2.write('\n\n')
+        elif type=='json':
+
+            with open(writePath_html, 'a') as f1:
+                #f.write(json.dumps(html_content_dictionary, indent=4))
+                soup = BeautifulSoup(section_content, "html.parser")
+                f1.write(str(soup.prettify()))
+            with open(writePath_md, 'a') as f2:
+                #f.write(json.dumps(html_content_dictionary, indent=4))
+                soup = BeautifulSoup(section_content, "html.parser")
+                #f2.write(str(soup.prettify()))
+
+
+                # html_content_dictionary = {element[0]:element[1:] for element in html_content_parsed}
+                # f2.write(json.dumps(html_content_dictionary, indent=4))
+
+                import ast
+                loads = ast.literal_eval(section_content)
+                #df = pd.DataFrame.from_dict(loads)
+                #df.drop(['dont'], axis=1, inplace=True)
+                #print(df.to_markdown(index=False,tablefmt='fancy_grid'))
+                for each in loads:
+                    f2.write(each + " = " + str(loads[each]) + "\n\n")
+
+        elif type=='dict':
+
+            for section_content in section_content_list:
+                if isinstance(section_content, str):
+                    import ast
+                    section_content = ast.literal_eval(section_content)
+
+                with open(writePath_html, 'a') as f1:
+                    soup = BeautifulSoup(str(section_content), "html.parser")
+                    f1.write(str(soup.prettify()))
+                with open(writePath_md, 'a') as f2:
+                    for each in section_content:
+                        f2.write(each + " = " + str(section_content[each]) + "\n\n")
+
+        elif type=='text':
+            with open(writePath_html, 'a') as f1:
+                for each_line in section_content_list:
+                    f1.write(each_line + '<br>')
+            with open(writePath_md, 'a') as f2:
+                for each_line in section_content_list:
+                    f2.write(each_line + '\n\n')
+
+        with open(writePath_html, 'a') as f1:
+            f1.write('<hr>')
+
+def print_and_report(text_single, title):
+    include_in_html_report("text", section_content=title)
+    for each in text_single:
+        print(each)
+        include_in_html_report("text", section_header="", section_content=each)
 
 
 if __name__ == '__main__':

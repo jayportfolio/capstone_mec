@@ -63,19 +63,33 @@ def convert_to_dummied(df, categories):
 
 
 def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_webapp_run=False, versioned=False):
-    print('getting test data for version', VERSION)
+    if not versioned:
+        raise AttributeError("need to check all calls that don't use versioned=True, and rewrite if necessary")
+
     suffix = "_no_nulls" if drop_nulls else ""
 
     try:
         if versioned:
-            X_train = np.loadtxt(f"train_test/X_train_v{VERSION}.csv", delimiter=",")
-            y_train = np.loadtxt(f"train_test/y_train_v{VERSION}.csv", delimiter=",")
+            print('getting test data for version', VERSION)
+            #X_train = np.loadtxt(f"train_test/X_train_v{VERSION}.csv", delimiter=",")
+            #y_train = np.loadtxt(f"train_test/y_train_v{VERSION}.csv", delimiter=",")
+            X_test = np.loadtxt(f"train_test/X_test_v{VERSION}.csv", delimiter=",")
+            y_test = np.loadtxt(f"train_test/y_test_v{VERSION}.csv", delimiter=",")
+            #feature_names = np.loadtxt(f"train_test/feature_names_v{VERSION}.csv", delimiter=",")
+            feature_names_str = np.genfromtxt(f"train_test/feature_names_v{VERSION}.csv",dtype='str')
+            #print("feature_names")
+            #print(type(feature_names_str))
+            #print(feature_names_str)
+            #print("000000", str(feature_names_str))
+            x = str(feature_names_str)
+            feature_names = x.split(',')
+            #print("feature_names",type(feature_names), feature_names)
         elif not test_data_only:
+            print('getting suffix test data', VERSION)
             X_train = np.loadtxt(f"train_test/X_train{suffix}.csv", delimiter=",")
             y_train = np.loadtxt(f"train_test/y_train{suffix}.csv", delimiter=",")
-
-        X_test = np.loadtxt(f"train_test/X_test{suffix}.csv", delimiter=",")
-        y_test = np.loadtxt(f"train_test/y_test{suffix}.csv", delimiter=",")
+            X_test = np.loadtxt(f"train_test/X_test{suffix}.csv", delimiter=",")
+            y_test = np.loadtxt(f"train_test/y_test{suffix}.csv", delimiter=",")
     except Exception as e:
         print('ENDED UP IN GENERAL EXCEPTION', e)
         print(e)
@@ -96,10 +110,11 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
 
         if versioned:
             if not test_data_only:
-                np.savetxt(f"train_test/X_train_v{VERSION}.csv", X_train, delimiter=",")
-                np.savetxt(f"train_test/y_train_v{VERSION}.csv", y_train, delimiter=",")
-            np.savetxt(f"train_test/X_test_v{VERSION}.csv", X_test, delimiter=",")
-            np.savetxt(f"train_test/y_test_v{VERSION}.csv", y_test, delimiter=",")
+                np.savetxt(f"train_test/X_train_v{VERSION}.csv", X_train, delimiter=",", fmt="%f")
+                np.savetxt(f"train_test/y_train_v{VERSION}.csv", y_train, delimiter=",", fmt="%f")
+            np.savetxt(f"train_test/X_test_v{VERSION}.csv", X_test, delimiter=",", fmt="%f")
+            np.savetxt(f"train_test/y_test_v{VERSION}.csv", y_test, delimiter=",", fmt="%f")
+            np.savetxt(f"train_test/feature_names_v{VERSION}.csv", [feature_names], delimiter=",", fmt="%s")
         else:
             if not test_data_only:
                 suffix = '_no_nulls' if drop_nulls else ''
@@ -131,8 +146,8 @@ def tt_split(VERSION, df, RANDOM_STATE=101, LABEL='Price'):
         if debug_mode:print("updated df!!!")
         if debug_mode:print(df.head(1))
         if debug_mode:print("df.columns[1:]", df.columns[1:])
-        returnable_columns = df.columns[1:]
-        if debug_mode:print("returnable_columns", returnable_columns)
+        feature_names_internal = df.columns[1:]
+        if debug_mode:print("returnable_columns", feature_names_internal)
 
     # features = df[df.columns[:-1]].values
     features = df[df.columns[1:]].values
@@ -140,6 +155,6 @@ def tt_split(VERSION, df, RANDOM_STATE=101, LABEL='Price'):
     labels = df[LABEL].values
     X_train, X_test, y_train, y_test = train_test_split(features, labels, train_size=0.9, random_state=RANDOM_STATE)
 
-    if debug_mode:print("returnable_columns", returnable_columns)
-    return X_train, X_test, y_train, y_test, returnable_columns
+    #print("feature_names_internal", feature_names_internal)
+    return X_train, X_test, y_train, y_test, feature_names_internal
 

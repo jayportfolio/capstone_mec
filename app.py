@@ -19,12 +19,15 @@ previous_data_version = DATA_VERSION
 
 prediction_models = {
     'XG Boost (data version 11) - Best model': 'optimised_model_XG Boost (tree)_v11',
-    'XG Boost (data version 9) - Good model': 'optimised_model_XG Boost (tree)_v10',
+    'XG Boost (data version 10) - Good model': 'optimised_model_XG Boost (tree)_v10',
     'KNN (data version 6) - Fastest to train, Good model': 'optimised_model_KNN_v06',
-    'Catboost (data version 6)': 'optimised_model_CatBoost_v06',
-    'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
+    'Catboost (data version 6) - Good model': 'optimised_model_CatBoost_v06',
+    #'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
     'Random Forests (data version 9) - Fair model': 'optimised_model_Random Forest_v09',
-    'Neural Network (data version 11) - Fair model': 'optimised_model_Neural Network_v11',
+    #'Neural Network (data version 11) - Fair model': 'optimised_model_Neural Network_v11',
+    'Neural Network (data version 6) - Fair model': 'neural network m11 mega (v06)_v06',
+    'Neural Network (data version 11) - Fail model': 'neural network m15 mega + dropout (v11)_v06',
+    'Neural Network (data version 11) - Bad model': 'neural network m15 mega + dropout (v11)_v11',
     'Linear Regression (data version 11) - Poor model': 'optimised_model_Linear Regression (Ridge)_v11',
     'Linear Regression (data version 6) - Poor model': 'optimised_model_Linear Regression (Ridge)_v06',
 }
@@ -61,18 +64,8 @@ def main():
     selected_model_key = st.selectbox('Which model do you want to use?', available_models)
     selected_model = prediction_models[selected_model_key]
 
-    try:
-        # model_path = f'models_pretrained/{selected_model}.pkl'
-        # model = pickle.load(open(model_path, 'rb'))
-        from functions_gh_presentation_and_launch import load_standard_model
-        model = load_standard_model(selected_model=selected_model, model_type='neural' if 'eural' in selected_model else 'standard')
-        DATA_VERSION = selected_model[-2:]
-        if DATA_VERSION != previous_data_version:
-            X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
-            previous_data_version = DATA_VERSION
-    except:
-        # raise ValueError(f'failed to load model: {model_path}')
-        raise ValueError(f'failed to load model: {selected_model}')
+
+    model = load_model(selected_model)
 
     # manual_parameters = st.checkbox('Use manual parameters instead of sample')
     manual_parameters = False
@@ -95,6 +88,13 @@ def main():
         update_about_property(feature_names, rand_index, random_instance)
 
     if st.button('Predict'):
+        DATA_VERSION = selected_model[-2:]
+        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
+        try:
+            acc = model.score(X_test, y_test)
+            st.write('Accuracy of test set: ', acc)
+        except:
+            pass
 
         if not manual_parameters:
             try:
@@ -141,14 +141,36 @@ def main():
 
             # st.text(f'Actual value of property {rand_index}: {expected}')
 
+        print("")
+        print("")
+        print("")
+        print("")
+        print("")
+        print("")
         print("inputs:", inputs)
+        print("inputs:", len(inputs))
+        print("inputs:", len(inputs[0]))
 
-        result = model.predict(inputs)
+        # X_test, y_test, feature_names = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+        #
+        # y_pred = model.predict(X_test)
+        # assert type(y_pred) == type(y_test)
+        # assert len(y_pred) == len(y_test)
+
+        model.summary()
+
+        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+        fake_X = [[0]*len(X_test[0]),]
+        print("fake_X", fake_X)
+        print("X_test", X_test)
+        result = model.predict(fake_X)
+        result = model.predict(X_test)
         updated_res = result.flatten().astype(float)
         st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]))
         st.warning('The actual price for this property is £{:.0f}'.format(expected))
 
         fig, ax = plt.subplots()
+        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
         y_pred = model.predict(X_test).flatten()
         ax.scatter(y_test, y_pred, s=25, c='blue')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, c='black')
@@ -163,12 +185,12 @@ def main():
 
         st.pyplot(fig)
 
-    DATA_VERSION = selected_model[-2:]
-    X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
-    acc = model.score(X_test, y_test)
-    st.write('Accuracy of test set: ', acc)
-
     if st.checkbox('View all available predictions (entire test set)'):
+        DATA_VERSION = selected_model[-2:]
+        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
+        acc = model.score(X_test, y_test)
+        st.write('Accuracy of test set: ', acc)
+
         y_pred = model.predict(X_test).flatten()
         multiple_predictions = np.vstack((y_test.flatten(), y_pred)).T
         multiple_predictions_df = pd.DataFrame(multiple_predictions, columns=['Actual Price', 'Predicted Price'])
@@ -218,6 +240,23 @@ def main():
             else:
                 print("File does not exist:", deletable_file)
             # Showing the message instead of throwing an error
+
+
+def load_model(selected_model):
+    global DATA_VERSION, X_test, y_test, feature_names, previous_data_version
+    try:
+        # model_path = f'models_pretrained/{selected_model}.pkl'
+        # model = pickle.load(open(model_path, 'rb'))
+        from functions_gh_presentation_and_launch import load_standard_model
+        model = load_standard_model(selected_model=selected_model, model_type='neural' if 'eural' in selected_model else 'standard')
+        DATA_VERSION = selected_model[-2:]
+        if DATA_VERSION != previous_data_version:
+            X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
+            previous_data_version = DATA_VERSION
+    except:
+        # raise ValueError(f'failed to load model: {model_path}')
+        raise ValueError(f'failed to load model: {selected_model}')
+    return model
 
 
 def update_about_property(feature_names, rand_index, random_instance):

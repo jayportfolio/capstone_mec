@@ -773,7 +773,7 @@ def plot_loss(history):
     plt.ylabel('Error [Property Price]')
     plt.legend()
     plt.grid(True)
-    plt.yticks(np.arange(min_y, max_y, ticks))  # JHJH
+    plt.yticks(np.arange(min_y, max_y, ticks))
     return loss_fig, loss_ax
 
 loss_fig, loss_ax = plot_loss(history)
@@ -801,7 +801,7 @@ def plot_loss(history):
     plt.ylabel('Error [Property Price]')
     plt.legend()
     plt.grid(True)
-    plt.yticks(np.arange(min_y, max_y, ticks))  # JHJH
+    plt.yticks(np.arange(min_y, max_y, ticks))
     return loss_fig, loss_ax
 
 loss_fig, loss_ax = plot_loss(history)
