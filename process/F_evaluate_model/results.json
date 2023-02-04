@@ -1,0 +1,23 @@
+{
+    "neural network m16 mega + dropout (v09)": {
+        "Mean Absolute Error Accuracy": 50507.39260423748,
+        "Mean Squared Error Accuracy": 4308578497.196369,
+        "R square Accuracy": 0.6185885458815552,
+        "Root Mean Squared Error": 65639.76307998353,
+        "_method": "loss=4.75e+04 valloss=5.06e+04 +valsplit=0.1 +patn=25 stop=94/400 ",
+        "_params": "mae +epochs=400 +learn=0.0003",
+        "_score": 0.6185885458815552,
+        "_train time": 378.44,
+        "best is shared": false,
+        "best method": "loss=4.75e+04 valloss=5.06e+04 +valsplit=0.1 +patn=25 stop=94/400 ",
+        "best params": "mae +epochs=400 +learn=0.0003",
+        "best run date": "2023-02-04 20:50:55.273598",
+        "best score": 0.6185885458815552,
+        "best time": 378.44,
+        "date": "2023-02-04 20:50:55.273598",
+        "first run": "2023-02-04 20:50:55.273713",
+        "random_state": 101,
+        "run_env": "gradient",
+        "suboptimal": "pending"
+    }
+}

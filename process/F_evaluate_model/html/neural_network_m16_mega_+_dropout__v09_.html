@@ -1,0 +1,333 @@
+<h1>Results from Neural Network m16 mega + dropout</h1><h3>Dataset Version: 09</h3>Date run: 2023-02-04 20:51:06.292458<br>Start time: 2023-02-04 20:44:27.869973<br>End time: 2023-02-04 20:51:05.972534<br><hr><h2>Results</h2><h3>Summary</h3>saved (rather than pickled) new version of model
+0.6185885458815552 is new best score (it's better than -999)<br><hr><h3>Best Model: Comparing model predictions to actual property values</h3><img src="../artifacts/neural_network_m16_mega_+_dropout__v09__best_ann_model.png"/><hr><h3>Model Specific Notes</h3>can't display hyperparameter comparison for neural network<br>can't display model performance graphs for neural network<br>can't display model performance graphs for neural network<br><hr><h3>Neural Network Loss - Head</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>loss</th>
+      <th>mean_squared_error</th>
+      <th>val_loss</th>
+      <th>val_mean_squared_error</th>
+      <th>epoch</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>85816.679688</td>
+      <td>1.645202e+10</td>
+      <td>61603.421875</td>
+      <td>5.996966e+09</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>60427.660156</td>
+      <td>5.894241e+09</td>
+      <td>56534.757812</td>
+      <td>5.168631e+09</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>59118.511719</td>
+      <td>5.651201e+09</td>
+      <td>56144.890625</td>
+      <td>5.152506e+09</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>58342.968750</td>
+      <td>5.513977e+09</td>
+      <td>56127.613281</td>
+      <td>4.993840e+09</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>58022.148438</td>
+      <td>5.470823e+09</td>
+      <td>55382.589844</td>
+      <td>4.905262e+09</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table><hr><br><hr><h3>Neural Network Loss - Tail</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>loss</th>
+      <th>mean_squared_error</th>
+      <th>val_loss</th>
+      <th>val_mean_squared_error</th>
+      <th>epoch</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>89</th>
+      <td>47727.378906</td>
+      <td>4.020816e+09</td>
+      <td>50782.875000</td>
+      <td>4.340920e+09</td>
+      <td>89</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>47736.082031</td>
+      <td>4.025026e+09</td>
+      <td>50707.023438</td>
+      <td>4.336488e+09</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>91</th>
+      <td>47613.828125</td>
+      <td>4.001108e+09</td>
+      <td>51292.863281</td>
+      <td>4.432039e+09</td>
+      <td>91</td>
+    </tr>
+    <tr>
+      <th>92</th>
+      <td>47867.324219</td>
+      <td>4.038065e+09</td>
+      <td>51019.437500</td>
+      <td>4.330976e+09</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>93</th>
+      <td>47476.230469</td>
+      <td>3.989517e+09</td>
+      <td>50700.875000</td>
+      <td>4.336359e+09</td>
+      <td>93</td>
+    </tr>
+  </tbody>
+</table><hr><img src="../artifacts/neural_network_m16_mega_+_dropout__v09__end_loss.png"/><hr><h3>Model Structure</h3>>Model: "sequential"
+>________________________________________________________________________________________________________________________________________________________________
+> Layer (type)                                                           Output Shape                                                    Param #                 
+>
+> normalization (Normalization)                                          (None, 21)                                                      43                      
+>                                                                                                                                                                
+> dense (Dense)                                                          (None, 128)                                                     2816                    
+>                                                                                                                                                                
+> dense_1 (Dense)                                                        (None, 256)                                                     33024                   
+>                                                                                                                                                                
+> activation (Activation)                                                multiple                                                        0                       
+>                                                                                                                                                                
+> dense_2 (Dense)                                                        (None, 512)                                                     131584                  
+>                                                                                                                                                                
+> dropout (Dropout)                                                      (None, 512)                                                     0                       
+>                                                                                                                                                                
+> dense_3 (Dense)                                                        (None, 1024)                                                    525312                  
+>                                                                                                                                                                
+> dense_4 (Dense)                                                        (None, 1024)                                                    1049600                 
+>                                                                                                                                                                
+> dropout_1 (Dropout)                                                    (None, 1024)                                                    0                       
+>                                                                                                                                                                
+> dense_5 (Dense)                                                        (None, 512)                                                     524800                  
+>                                                                                                                                                                
+> dense_6 (Dense)                                                        (None, 256)                                                     131328                  
+>                                                                                                                                                                
+> dense_7 (Dense)                                                        (None, 1)                                                       257                     
+>                                                                                                                                                                
+>
+>Total params: 2,398,764
+>Trainable params: 2,398,721
+>Nontrainable params: 43
+>________________________________________________________________________________________________________________________________________________________________
+<br><hr><h2>Comparison with other models</h2><h3>Comparison with version 09 performances</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>best score</th>
+      <th>best time</th>
+      <th>Mean Absolute Error Accuracy</th>
+      <th>Mean Squared Error Accuracy</th>
+      <th>R square Accuracy</th>
+      <th>Root Mean Squared Error</th>
+      <th>best run date</th>
+      <th>best method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>neural network m16 mega + dropout (v09)</th>
+      <td>0.618589</td>
+      <td>378.44</td>
+      <td>50507.392604</td>
+      <td>4308578497.196369</td>
+      <td>0.618589</td>
+      <td>65639.76308</td>
+      <td>2023-02-04 20:50:55.273598</td>
+      <td>loss=4.75e+04 valloss=5.06e+04 +valsplit=0.1 +patn=25 stop=94/400</td>
+    </tr>
+  </tbody>
+</table><hr><h3>Comparison with all model performances</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>best score</th>
+      <th>best time</th>
+      <th>Mean Absolute Error Accuracy</th>
+      <th>Mean Squared Error Accuracy</th>
+      <th>R square Accuracy</th>
+      <th>Root Mean Squared Error</th>
+      <th>best run date</th>
+      <th>best method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>neural network m16 mega + dropout (v09)</th>
+      <td>0.618589</td>
+      <td>378.44</td>
+      <td>50507.392604</td>
+      <td>4308578497.196369</td>
+      <td>0.618589</td>
+      <td>65639.76308</td>
+      <td>2023-02-04 20:50:55.273598</td>
+      <td>loss=4.75e+04 valloss=5.06e+04 +valsplit=0.1 +patn=25 stop=94/400</td>
+    </tr>
+  </tbody>
+</table><hr><h2>Appendix</h2><h3>Data Sample</h3><table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Price</th>
+      <th>bedrooms</th>
+      <th>bathrooms</th>
+      <th>nearestStation</th>
+      <th>location.latitude</th>
+      <th>location.longitude</th>
+      <th>latitude_deviation</th>
+      <th>longitude_deviation</th>
+      <th>tenure.tenureType</th>
+      <th>feature__balcony</th>
+      <th>feature__chain free</th>
+      <th>feature__no onward chain</th>
+      <th>feature__off street parking</th>
+      <th>feature__one bedroom</th>
+      <th>feature__private balcony</th>
+      <th>feature__share of freehold</th>
+      <th>feature__three bedrooms</th>
+      <th>feature__two bedrooms</th>
+      <th>feature__two double bedrooms</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>14520525</th>
+      <td>550000.0</td>
+      <td>3.0</td>
+      <td>1.0</td>
+      <td>0.274316</td>
+      <td>51.529950</td>
+      <td>-0.207020</td>
+      <td>0.030230</td>
+      <td>0.102600</td>
+      <td>LEASEHOLD</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>27953107</th>
+      <td>400000.0</td>
+      <td>2.0</td>
+      <td>2.0</td>
+      <td>0.305845</td>
+      <td>51.549390</td>
+      <td>-0.482600</td>
+      <td>0.049670</td>
+      <td>0.378180</td>
+      <td>LEASEHOLD</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>33593487</th>
+      <td>579950.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>0.438045</td>
+      <td>51.447180</td>
+      <td>-0.338770</td>
+      <td>0.052540</td>
+      <td>0.234350</td>
+      <td>FREEHOLD</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>35271294</th>
+      <td>370000.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>0.399307</td>
+      <td>51.449568</td>
+      <td>-0.140154</td>
+      <td>0.050152</td>
+      <td>0.035734</td>
+      <td>LEASEHOLD</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>44749111</th>
+      <td>475000.0</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>0.410550</td>
+      <td>51.370050</td>
+      <td>-0.212410</td>
+      <td>0.129670</td>
+      <td>0.107990</td>
+      <td>FREEHOLD</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table><hr><h3>Environment Variables</h3>{'notebook_environment': 'gradient', 'use_gpu': True, 'debug_mode': False, 'quick_mode': False, 'quick_override_cv_splits': 2, 'quick_override_n_iter': 10, 'quick_override_n_jobs': 3}
+<hr><h3>Useful info</h3>Tensorflow version: 2.9.1<br><hr>

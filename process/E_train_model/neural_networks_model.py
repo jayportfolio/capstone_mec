@@ -83,7 +83,10 @@ price_divisor = 1
 # selected_neural_network = selected_nn_code = "m14 mega"
 
 # ---- 10th NEURAL NETWORK STRUCTURE DEFINITION ---- #
-selected_neural_network = selected_nn_code = "m15 mega + dropout"
+#selected_neural_network = selected_nn_code = "m15 mega + dropout"
+
+# ---- 11th NEURAL NETWORK STRUCTURE DEFINITION ---- #
+selected_neural_network = selected_nn_code = "m16 mega + dropout"
 
 ALGORITHM = ALGORITHM.replace("[TYPE]", selected_nn_code)
 
@@ -186,12 +189,16 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 # from scikeras.wrappers import KerasClassifier, KerasRegressor
 
 import tensorflow as tf
+
 from keras import layers
 from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense
 
 print("Tensorflow version:", tf.__version__)
+#tf.compat.v2.disable_eager_execution()
+print("Tensorflow version:", tf.__version__)
+#raise ValueError('break here')
 
 loss_dict = {
     "mean_squared_error": 'mse',
@@ -438,8 +445,10 @@ def make_simple_ann(key, inputs=-1):
         epochs = 400
         chosen_loss = 'mean_absolute_error'  # 'mean_squared_error'
 
-    elif key == "m15 mega + dropout":
+    elif key == "m16 mega + dropout":
+        #input_shape=[1,], axis=None
         normalizer = tf.keras.layers.Normalization(axis=-1)
+        #normalizer = tf.keras.layers.Normalization(input_shape=[1,], axis=-1)
         normalizer.adapt(np.array(X_train))
         batchnorm = layers.BatchNormalization()
         activation = layers.Activation('relu')
@@ -452,28 +461,29 @@ def make_simple_ann(key, inputs=-1):
 
         # The Hidden Layers :
         chosen_model.add(Dense(256, kernel_initializer='normal'))
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
         chosen_model.add(Dense(512, kernel_initializer='normal'))
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
 
         chosen_model.add(keras.layers.Dropout(rate=0.2))
 
         chosen_model.add(Dense(1024, kernel_initializer='normal'))
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
         chosen_model.add(Dense(1024, kernel_initializer='normal'))
 
         chosen_model.add(keras.layers.Dropout(rate=0.2))
 
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
         chosen_model.add(Dense(512, kernel_initializer='normal'))
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
         chosen_model.add(Dense(256, kernel_initializer='normal'))
-        chosen_model.add(layers.BatchNormalization())
+        #chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
 
         # The Output Layer :
@@ -481,6 +491,7 @@ def make_simple_ann(key, inputs=-1):
 
         learn_rate = 0.0003
         epochs = 400
+        #epochs = 60 # TODO
         chosen_loss = 'mean_absolute_error'  # 'mean_squared_error'
 
     else:
@@ -493,7 +504,9 @@ def make_simple_ann(key, inputs=-1):
     # Compile the network :
     chosen_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=learn_rate),
-        loss=chosen_loss)
+        loss=chosen_loss,
+        metrics=[tf.keras.metrics.MeanSquaredError()]
+    )
 
     new_algorithm_detail = ALGORITHM_DETAIL_ORIG + loss_dict[chosen_loss]
     new_algorithm_detail += f' +epochs={epochs}'
@@ -606,8 +619,8 @@ if price_divisor != 1:
     print('in preprocessing, divided all Prices by ', price_divisor)
     more_detail += f' div={price_divisor}'
 
-print(more_detail)
-print(ALGORITHM_DETAIL)
+print("more_detail:", more_detail)
+print("ALGORITHM_DETAIL:", ALGORITHM_DETAIL)
 
 hist.tail()
 
@@ -622,9 +635,9 @@ def plot_loss(history):
     # max_y = min(sorted(history.history['val_loss'])[-3],sorted(history.history['loss'])[-3]) + 100
     max_y = min(sorted(history.history['val_loss'])[-1], sorted(history.history['val_loss'])[-1])
 
-    print(max_y - min_y)
+    print("difference between max and min:", max_y - min_y)
     ticks = (max_y - min_y) / 10
-    print(ticks)
+    print("tick size:", ticks)
 
     plt.ylim([min_y, max_y])
     plt.xlabel('Epoch')
@@ -636,6 +649,35 @@ def plot_loss(history):
 
 
 loss_fig, loss_ax = plot_loss(history)
+
+
+
+# Calling `save('my_model')` creates a SavedModel folder `my_model`.
+#trainable_model.save("my_model", save_format='t5')
+#trainable_model.save("my_model.h5")
+tf.keras.models.save_model(trainable_model, "test_model")
+
+# It can be used to reconstruct the model identically.
+#reconstructed_model = keras.models.load_model("my_model")
+#reconstructed_model = keras.models.load_model("my_model.h5")
+reconstructed_model = tf.keras.models.load_model("test_model")
+
+print("TRAINABLE MODEL SUMMARY")
+trainable_model.summary()
+
+print("RECONSTRUCTED MODEL SUMMARY")
+reconstructed_model.summary()
+
+print()
+print()
+print("trainable_model weights", trainable_model.get_weights()[:1])
+print("reconstructed_model weights", trainable_model.get_weights()[:1])
+
+# Let's check:
+#np.testing.assert_allclose(
+#    trainable_model.predict(X_test), reconstructed_model.predict(X_test)
+#)
+
 
 y_pred = trainable_model.predict(X_test)
 
