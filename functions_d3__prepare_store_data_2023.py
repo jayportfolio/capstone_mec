@@ -82,6 +82,9 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
             #print(feature_names_str)
             #print("000000", str(feature_names_str))
             x = str(feature_names_str)
+            #print("x0",type(x), x)
+            x = x[2:-2].replace("' '"," ")
+            #print("x1",type(x), x)
             feature_names = x.split(',')
             #print("feature_names",type(feature_names), feature_names)
         elif not test_data_only:
@@ -103,7 +106,7 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
         # labels = df[LABEL].values
         # X_train, X_test, y_train, y_test = train_test_split(features, labels, train_size=0.9, random_state=RANDOM_STATE)
         X_train, X_test, y_train, y_test, feature_names = tt_split(VERSION, df)
-        print("feature_names", "feature_names")
+        #print("feature_names", "feature_names")
 
         print('test_data_only', test_data_only)
         print('drop_nulls', drop_nulls)

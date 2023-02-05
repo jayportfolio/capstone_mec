@@ -1,9 +1,14 @@
+import time
+
 import pandas as pd
 import streamlit as st
 import numpy as np
 import random
 import matplotlib.pyplot as plt
 import os
+
+from sklearn.metrics import PredictionErrorDisplay
+from sklearn.model_selection import cross_validate, cross_val_predict
 
 from functions_b__get_the_data_2023 import get_source_dataframe
 from functions_d3__prepare_store_data_2023 import this_test_data
@@ -19,15 +24,15 @@ previous_data_version = DATA_VERSION
 
 prediction_models = {
     'XG Boost (data version 11) - Best model': 'optimised_model_XG Boost (tree)_v11',
+    'Stacked Model': 'stacked model',
     'XG Boost (data version 10) - Good model': 'optimised_model_XG Boost (tree)_v10',
     'KNN (data version 6) - Fastest to train, Good model': 'optimised_model_KNN_v06',
     'Catboost (data version 6) - Good model': 'optimised_model_CatBoost_v06',
     #'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
     'Random Forests (data version 9) - Fair model': 'optimised_model_Random Forest_v09',
-    #'Neural Network (data version 11) - Fair model': 'optimised_model_Neural Network_v11',
-    'Neural Network (data version 6) - Fair model': 'neural network m11 mega (v06)_v06',
-    'Neural Network (data version 11) - Fail model': 'neural network m15 mega + dropout (v11)_v06',
-    'Neural Network (data version 11) - Bad model': 'neural network m15 mega + dropout (v11)_v11',
+    #'Neural Network (data version 9) - Fair model': 'optimised_neural network m15 mega + dropout (v09)_v09',
+    #'Neural Network (data version 9) - Fair model': 'optimised_neural network m16 mega + dropout (v09)_v09',
+    'Neural Network (data version 11) - Mediocre model': 'optimised_neural network m16 mega + dropout (v11)_v11',
     'Linear Regression (data version 11) - Poor model': 'optimised_model_Linear Regression (Ridge)_v11',
     'Linear Regression (data version 6) - Poor model': 'optimised_model_Linear Regression (Ridge)_v06',
 }
@@ -46,26 +51,88 @@ def main():
     st.markdown(
         "<h1 style='text-align: center; color: White;background-color:#e84343'>London Property Prices Predictor</h1>",
         unsafe_allow_html=True)
-    st.markdown(
-        "<h3 style='text-align: center; color: Black;'>Insert your property parameters here, or choose a random pre-existing property.</h3>",
-        unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align: center; color: Black;'>Sub heading here</h4>",
+    #st.markdown(
+    #    "<h3 style='text-align: center; color: Black;'>.</h3>",
+    #    unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: Black;'>Choose a random property and a prediction algorithm, and predict the property price</h4>",
                 unsafe_allow_html=True)
 
     st.sidebar.header("What is this Project about?")
     st.sidebar.markdown(
-        "This is a Web app that would predict the price of a London property based on parameters.")
+        "This is a Web app that can predict the price of a London property based on features of that property.")
     st.sidebar.header("Sidebar Options")
-    include_nulls = st.sidebar.checkbox('include rows with any nulls ')
+    #include_nulls = st.sidebar.checkbox('include rows with any nulls ')
 
 
     available_models = prediction_models.keys()
 
     selected_model_key = st.selectbox('Which model do you want to use?', available_models)
-    selected_model = prediction_models[selected_model_key]
 
+    if selected_model_key == 'Stacked Model':
+        from sklearn.ensemble import StackingRegressor
+        from sklearn.linear_model import RidgeCV
 
-    model = load_model(selected_model)
+        estimators = [
+            ("Random Forest1", load_model('optimised_model_XG Boost (tree)_v10')),
+            ("Random Forest2", load_model('optimised_model_CatBoost_v10(no dummies)_v10'))
+            #("Lasso", lasso_pipeline),
+            #("Gradient Boosting", gbdt_pipeline),
+        ]
+
+        stacking_regressor = StackingRegressor(estimators=estimators, final_estimator=RidgeCV())
+        stacking_regressor
+
+        X = X_test
+        y = y_test
+
+        fig, axs = plt.subplots(2, 2, figsize=(9, 7))
+        axs = np.ravel(axs)
+
+        for ax, (name, est) in zip(
+                axs, estimators + [("Stacking Regressor", stacking_regressor)]
+        ):
+            scorers = {"R2": "r2", "MAE": "neg_mean_absolute_error"}
+
+            start_time = time.time()
+            scores = cross_validate(
+                est, X, y, scoring=list(scorers.values()), n_jobs=-1, verbose=0
+            )
+            elapsed_time = time.time() - start_time
+
+            y_pred = cross_val_predict(est, X, y, n_jobs=-1, verbose=0)
+            scores = {
+                key: (
+                    f"{np.abs(np.mean(scores[f'test_{value}'])):.2f} +- "
+                    f"{np.std(scores[f'test_{value}']):.2f}"
+                )
+                for key, value in scorers.items()
+            }
+
+            display = PredictionErrorDisplay.from_predictions(
+                y_true=y,
+                y_pred=y_pred,
+                kind="actual_vs_predicted",
+                ax=ax,
+                scatter_kwargs={"alpha": 0.2, "color": "tab:blue"},
+                line_kwargs={"color": "tab:red"},
+            )
+            ax.set_title(f"{name}\nEvaluation in {elapsed_time:.2f} seconds")
+
+            for name, score in scores.items():
+                ax.plot([], [], " ", label=f"{name}: {score}")
+            ax.legend(loc="upper left")
+
+        plt.suptitle("Single predictors versus stacked predictors")
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.show()
+
+        selected_model = 'stacked model_v11'
+        model = stacking_regressor
+
+    else:
+        selected_model = prediction_models[selected_model_key]
+        model = load_model(selected_model)
 
     # manual_parameters = st.checkbox('Use manual parameters instead of sample')
     manual_parameters = False
@@ -95,6 +162,7 @@ def main():
             st.write('Accuracy of test set: ', acc)
         except:
             pass
+
 
         if not manual_parameters:
             try:
@@ -151,19 +219,11 @@ def main():
         print("inputs:", len(inputs))
         print("inputs:", len(inputs[0]))
 
-        # X_test, y_test, feature_names = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
-        #
-        # y_pred = model.predict(X_test)
-        # assert type(y_pred) == type(y_test)
-        # assert len(y_pred) == len(y_test)
-
-        model.summary()
-
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
         fake_X = [[0]*len(X_test[0]),]
-        print("fake_X", fake_X)
-        print("X_test", X_test)
-        result = model.predict(fake_X)
+        #print("fake_X", fake_X)
+        #print("X_test", X_test)
+        #result = model.predict(fake_X)
         result = model.predict(X_test)
         updated_res = result.flatten().astype(float)
         st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]))
@@ -172,6 +232,10 @@ def main():
         fig, ax = plt.subplots()
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
         y_pred = model.predict(X_test).flatten()
+
+        from sklearn.metrics import r2_score
+        st.write('Score:' + str(r2_score(y_test, y_pred)))
+
         ax.scatter(y_test, y_pred, s=25, c='blue')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, c='black')
         try:
@@ -188,8 +252,11 @@ def main():
     if st.checkbox('View all available predictions (entire test set)'):
         DATA_VERSION = selected_model[-2:]
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
-        acc = model.score(X_test, y_test)
-        st.write('Accuracy of test set: ', acc)
+        try:
+            acc = model.score(X_test, y_test)
+            st.write('Accuracy of test set: ', acc)
+        except:
+            pass
 
         y_pred = model.predict(X_test).flatten()
         multiple_predictions = np.vstack((y_test.flatten(), y_pred)).T
@@ -199,10 +266,11 @@ def main():
         print("type(multiple_predictions_df):", type(multiple_predictions_df))
 
     if not manual_parameters:
-        if st.button('Get a different random property!'):
-            rand_index, random_instance, random_instance[0] = randomise_property(DATA_VERSION, test_size)
-            st.text(f'sample variables ({rand_index}): {random_instance[0]}')
-            st.text(f'Expected prediction: {y_test[rand_index]}')
+        pass
+        # if st.button('Get a different random property!'):
+        #     rand_index, random_instance, random_instance[0] = randomise_property(DATA_VERSION, test_size)
+        #     st.text(f'sample variables ({rand_index}): {random_instance[0]}')
+        #     st.text(f'Expected prediction: {y_test[rand_index]}')
 
     if st.checkbox('Show the underlying dataframe'):
         DATA_VERSION = selected_model[-2:]
@@ -211,38 +279,40 @@ def main():
         st.write(df)
 
 
-    if st.sidebar.button('Purge cache'):
-        #st.sidebar.error("I haven't added this functionality yet")
-
-        for deletable_file in [
-            'train_test/X_test.csv', 'train_test/X_test_no_nulls.csv', 'train_test/_train.csv',
-            'train_test/X_train_no_nulls.csv',
-            'train_test/y_test.csv', 'train_test/y_test_no_nulls.csv', 'train_test/y_train.csv',
-            'train_test/y_train_no_nulls.csv',
-            'models_pretrained/model_Decision Tree.pkl',
-            'models_pretrained/model_Deep Neural Network.pkl',
-            'models_pretrained/model_HistGradientBoostingRegressor.pkl',
-            'models_pretrained/model_Linear Regression.pkl',
-            'models_pretrained/model_Linear Regression (Keras).pkl',
-            'random_instance.csv',
-            'random_instance_plus.csv',
-            # functions.FINAL_RECENT_FILE,
-            # functions.FINAL_RECENT_FILE_SAMPLE,
-        ]:
-            # checking if file exist or not
-            if (os.path.isfile(deletable_file)):
-
-                # os.remove() function to remove the file
-                os.remove(deletable_file)
-
-                # Printing the confirmation message of deletion
-                print("File Deleted successfully:", deletable_file)
-            else:
-                print("File does not exist:", deletable_file)
-            # Showing the message instead of throwing an error
+    # if st.sidebar.button('Purge cache'):
+    #     #st.sidebar.error("I haven't added this functionality yet")
+    #
+    #     for deletable_file in [
+    #         'train_test/X_test.csv', 'train_test/X_test_no_nulls.csv', 'train_test/_train.csv',
+    #         'train_test/X_train_no_nulls.csv',
+    #         'train_test/y_test.csv', 'train_test/y_test_no_nulls.csv', 'train_test/y_train.csv',
+    #         'train_test/y_train_no_nulls.csv',
+    #         'models_pretrained/model_Decision Tree.pkl',
+    #         'models_pretrained/model_Deep Neural Network.pkl',
+    #         'models_pretrained/model_HistGradientBoostingRegressor.pkl',
+    #         'models_pretrained/model_Linear Regression.pkl',
+    #         'models_pretrained/model_Linear Regression (Keras).pkl',
+    #         'random_instance.csv',
+    #         'random_instance_plus.csv',
+    #         # functions.FINAL_RECENT_FILE,
+    #         # functions.FINAL_RECENT_FILE_SAMPLE,
+    #     ]:
+    #         # checking if file exist or not
+    #         if (os.path.isfile(deletable_file)):
+    #
+    #             # os.remove() function to remove the file
+    #             os.remove(deletable_file)
+    #
+    #             # Printing the confirmation message of deletion
+    #             print("File Deleted successfully:", deletable_file)
+    #         else:
+    #             print("File does not exist:", deletable_file)
+    #         # Showing the message instead of throwing an error
 
 
 def load_model(selected_model):
+    if selected_model == 'Stacked Model':
+        raise ValueError ('operate stacked model')
     global DATA_VERSION, X_test, y_test, feature_names, previous_data_version
     try:
         # model_path = f'models_pretrained/{selected_model}.pkl'
@@ -283,7 +353,7 @@ def randomise_property(DATA_VERSION, test_size):
     random_instance_plus.extend(random_instance[0])
     print("random_instance_plus:", random_instance_plus)
     np.savetxt("random_instance_plus.csv", [random_instance_plus], delimiter=",")
-    np.savetxt("rand_index", [rand_index], delimiter=",")
+    np.savetxt("rand_index.csv", [rand_index], delimiter=",")
 
     return rand_index, random_instance, random_instance[0]
 
