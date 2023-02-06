@@ -1,12 +1,12 @@
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from sklearn.linear_model import Ridge, LinearRegression
+from sklearn.linear_model import Ridge, LinearRegression, RidgeCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from sklearn.linear_model import Ridge
-from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegressor, StackingRegressor
 
 from time import time
 import json
@@ -157,6 +157,27 @@ def get_chosen_model(key):
     if key.lower() == 'catboost':
         from catboost import CatBoostRegressor
         CatBoostRegressor(objective='RMSE'),
+    elif key.lower() == 'stacked model':
+        modell = LinearRegression()
+        model_ridge = Ridge()
+
+        estimators = [
+            ##("Random Forest1", load_model('optimised_model_XG Boost (tree)_v10')),
+            ##("Random Forest2", load_model('optimised_model_XG Boost (tree)_v10')),
+            # ("Random Forest2", load_model('optimised_model_CatBoost_v10(no dummies)_v10'))
+            # ("Lasso", lasso_pipeline),
+            # ("Gradient Boosting", gbdt_pipeline),
+
+            ("ridge1", model_ridge),
+            #("Random Forest2", modell),
+            #xx("Random Forest3", load_model('optimised_model_Linear Regression (Ridge)_v11')),
+            #("Random Forest3", modell),
+
+        ]
+
+        stacking_regressor = StackingRegressor(estimators=estimators, final_estimator=RidgeCV())
+        return stacking_regressor
+
     elif key.lower() == 'light gradient boosting':
         import lightgbm as lgb
         from lightgbm import LGBMRegressor
@@ -168,6 +189,7 @@ def get_chosen_model(key):
             "XG Boost (tree)".lower(): XGBRegressor(),
             "XG Boost (linear)".lower(): XGBRegressor(),
             "Linear Regression (Ridge)".lower(): Ridge(),
+            "Stacked Model".lower(): Ridge(),
             "knn": KNeighborsRegressor(),
             "decision tree": DecisionTreeRegressor(),
             "random forest": RandomForestRegressor(),
@@ -176,7 +198,11 @@ def get_chosen_model(key):
             #"Light Gradient Boosting".lower(): 
         }
         try:
-            return models.get(key.lower())
+            chosen_model = models.get(key.lower())
+            if chosen_model == None:
+                raise LookupError("there was no model for key:" + key)
+            return chosen_model
+
         except:
             raise ValueError(f'no model found for key: {key}')
 

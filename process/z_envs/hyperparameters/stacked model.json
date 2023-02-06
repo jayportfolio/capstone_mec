@@ -1,1 +1,10 @@
-{}
+{
+	"ridge1__alpha": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+	"ridge1__fit_intercept": [true, false],
+	"ridge1__max_iter": [10000,1000, 100, 100000, 1000000],
+	"ridge1__positive": [false],
+	"ridge1__copy_X": [true, false],
+	"ridge1__solver": ["auto", "svd", "cholesky", "lsqr", "sparse_cg", "sag", "saga", "lbfgs"],
+	"ridge1__tol": [0.00001, 0.0001, 0.001, 0.01],
+	"ridge1__random_state": [101]
+}

@@ -217,7 +217,8 @@ LABEL = 'Price'
 # In[7]:
 
 
-df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
+#df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
+df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='./', row_limit=None)
 df_orig = df.copy()
 
 if retrieval_type != 'tidy':
@@ -323,6 +324,8 @@ param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block,
                                                                   override_verbose=OVERRIDE_VERBOSE
                                                                   )
 
+
+#param_options = {}
 
 if not using_catboost and len(param_options.keys()) > 2 and not already_timed and debug_mode:
     already_timed = True
@@ -656,7 +659,12 @@ if not using_catboost:
         best_model_scores[i] = fitted_graph_model.score(X_test, y_test)
 
     if debug_mode: print(f'{-1} ==> {-1}')
-    graph_pipe_params = cv_results_df_sorted['params'][total_fits - 1]
+    try:
+        graph_pipe_params = cv_results_df_sorted['params'][total_fits - 1]
+    except:
+        print("MAJOR ERROR? couldn't get cv_results_df_sorted, using cv_results_df_full_sorted instead")
+        graph_pipe_params = cv_results_df_full_sorted['params'][0]
+
     print(graph_pipe_params)
     graph_params = {}
     for key2, value in graph_pipe_params.items():
