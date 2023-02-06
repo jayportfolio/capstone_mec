@@ -39,6 +39,10 @@ def build_model(algorithm, drop_nulls=False):
         model = LinearRegression()
         model.fit(X_train, y_train)
 
+    elif algorithm == 'Stacked Model':
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+
     elif algorithm == 'HistGradientBoostingRegressor':
         model = HistGradientBoostingRegressor()
         model.fit(X_train, y_train)
@@ -197,7 +201,13 @@ def get_hyperparameters(key, use_gpu, prefix='./'):
             hyperparameters = json.loads(f.read())
 
     else:
-        raise ValueError("couldn't find hyperparameters for:", key)
+        try:
+            print("failed all other avenues, just trying to find the hyperparams with pattern-matching")
+            with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
+                hyperparameters = json.loads(f.read())
+            
+        except:
+            raise ValueError("couldn't find hyperparameters for:", key)
 
     return hyperparameters
 
