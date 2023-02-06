@@ -149,11 +149,13 @@ def main():
 
         fig, ax = plt.subplots()
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+        model = load_model(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
         y_pred = model.predict(X_test).flatten()
 
         if 'eural' in selected_model_key:
             from sklearn.metrics import r2_score
-            st.write('Score:' + str(r2_score(y_test, y_pred)))
+            st.write('Score:', r2_score(y_test, y_pred))
+            st.write('Accuracy of test set: ', acc)
 
         ax.scatter(y_test, y_pred, s=25, c='blue')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, c='black')

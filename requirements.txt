@@ -19,6 +19,7 @@ tensorflow-cpu
 # Newly added
 pytest
 matplotlib
+lightgbm
 
 # Temporarily remove for heroku slug
 #jupyter #==1.0.0
