@@ -28,132 +28,7 @@ def make_modelling_pipeline(model, DATA_DETAIL):
     return pipe
 
 
-def build_model(algorithm, drop_nulls=False):
-    X_train, X_test, y_train, y_test = this_test_data(drop_nulls=drop_nulls)
-
-    if algorithm == 'Decision Tree':
-        model = DecisionTreeRegressor()
-        model.fit(X_train, y_train)
-
-    elif algorithm == 'Linear Regression':
-        model = LinearRegression()
-        model.fit(X_train, y_train)
-
-    elif algorithm == 'Stacked Model':
-        model = LinearRegression()
-        model.fit(X_train, y_train)
-
-    elif algorithm == 'HistGradientBoostingRegressor':
-        model = HistGradientBoostingRegressor()
-        model.fit(X_train, y_train)
-
-    elif algorithm == 'Deep Neural Network':
-
-        import tensorflow as tf
-
-        from tensorflow import keras
-        from keras import layers
-
-        print(tf.__version__)
-
-        def build_and_compile_model(norm):
-            model = keras.Sequential([
-                norm,
-                layers.Dense(132, activation='relu'),
-                layers.Dense(132, activation='relu'),
-                #layers.Dense(400, activation='relu'),
-                #layers.Dense(400, activation='relu'),
-                #layers.Dense(400, activation='relu'),
-                layers.Dense(1)
-            ])
-
-            model.compile(loss='mean_absolute_error',
-                          optimizer=tf.keras.optimizers.Adam(0.001))
-            return model
-
-        normalizer = tf.keras.layers.Normalization(axis=-1)
-
-        dnn_model = build_and_compile_model(normalizer)
-        # print(dnn_model.summary())
-
-        # % % time
-        history = dnn_model.fit(
-            X_train,  # train_features,
-            y_train,  # train_labels,
-            validation_split=0.2,
-            verbose=0, epochs=100)
-
-        # def plot_loss(history):
-        #     import matplotlib.pyplot as plt
-        #     plt.plot(history.history['loss'], label='loss')
-        #     plt.plot(history.history['val_loss'], label='val_loss')
-        #     plt.ylim([0, 10])
-        #     plt.xlabel('Epoch')
-        #     plt.ylabel('Error [MPG]')
-        #     plt.legend()
-        #     plt.grid(True)
-        #
-        # plot_loss(history)
-
-        # test_results['dnn_model'] = dnn_model.evaluate(test_features, test_labels, verbose=0)
-        print(dnn_model.evaluate(X_test, y_test, verbose=0))
-
-        model = dnn_model
-
-    elif algorithm == 'Linear Regression (Keras)':
-        import tensorflow as tf
-
-        from tensorflow import keras
-        from keras import layers
-
-        print(tf.__version__)
-
-        normalizer = tf.keras.layers.Normalization(axis=-1)
-        linear_model = tf.keras.Sequential([
-            normalizer,
-            layers.Dense(units=1)
-        ])
-
-        linear_model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
-            loss='mean_absolute_error')
-
-        # %%time
-        history = linear_model.fit(
-            X_train,  # train_features,
-            y_train,  # train_labels,
-            epochs=100,
-            # Suppress logging.
-            verbose=0,
-            # Calculate validation results on 20% of the training data.
-            validation_split=0.2)
-
-        # def plot_loss(history):
-        #     import matplotlib.pyplot as plt
-        #     plt.plot(history.history['loss'], label='loss')
-        #     plt.plot(history.history['val_loss'], label='val_loss')
-        #     plt.ylim([0, 10])
-        #     plt.xlabel('Epoch')
-        #     plt.ylabel('Error [MPG]')
-        #     plt.legend()
-        #     plt.grid(True)
-        #
-        # plot_loss(history)
-
-        model = linear_model
-
-    elif algorithm == 'Linear Regression (Keras)':
-        from tensorflow_estimator.python.estimator.canned.linear import LinearRegressor
-
-        model = LinearRegressor()
-        model.fit(X_train, y_train)
-    else:
-        raise ValueError(algorithm)
-
-    return model
-
 def get_chosen_model(key):
-
     if key.lower() == 'catboost':
         from catboost import CatBoostRegressor
         CatBoostRegressor(objective='RMSE'),
@@ -169,9 +44,9 @@ def get_chosen_model(key):
             # ("Gradient Boosting", gbdt_pipeline),
 
             ("ridge1", model_ridge),
-            #("Random Forest2", modell),
-            #xx("Random Forest3", load_model('optimised_model_Linear Regression (Ridge)_v11')),
-            #("Random Forest3", modell),
+            # ("Random Forest2", modell),
+            # xx("Random Forest3", load_model('optimised_model_Linear Regression (Ridge)_v11')),
+            # ("Random Forest3", modell),
 
         ]
 
@@ -193,9 +68,9 @@ def get_chosen_model(key):
             "knn": KNeighborsRegressor(),
             "decision tree": DecisionTreeRegressor(),
             "random forest": RandomForestRegressor(),
-            #"CatBoost".lower(): 
-            #XXX "CatBoost".lower(): CatBoostRegressor(objective='R2'),
-            #"Light Gradient Boosting".lower(): 
+            # "CatBoost".lower():
+            # XXX "CatBoost".lower(): CatBoostRegressor(objective='R2'),
+            # "Light Gradient Boosting".lower():
         }
         try:
             chosen_model = models.get(key.lower())
@@ -221,7 +96,7 @@ def get_hyperparameters(key, use_gpu, prefix='./'):
             pass
 
     elif key.lower() in ['catboost', 'random forest', "Linear Regression (Ridge)".lower(), "Light Gradient Boosting".lower(),
-                         'knn','decision tree','xg boost (tree)','xg boost (linear)']:
+                         'knn', 'decision tree', 'xg boost (tree)', 'xg boost (linear)']:
 
         with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
             hyperparameters = json.loads(f.read())
@@ -231,7 +106,7 @@ def get_hyperparameters(key, use_gpu, prefix='./'):
             print("failed all other avenues, just trying to find the hyperparams with pattern-matching")
             with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
                 hyperparameters = json.loads(f.read())
-            
+
         except:
             raise ValueError("couldn't find hyperparameters for:", key)
 
@@ -281,9 +156,10 @@ def fit_model_with_cross_validation(gs, X_train, y_train, fits):
 
     return cv_result, average_time, cv_result.refit_time_, len(cv_result.cv_results_["mean_fit_time"])
 
+
 def automl_step(param_options, vary):
     for key, value in param_options.items():
-        #print(key, value, vary)
+        # print(key, value, vary)
         if key != vary and key != 'model__' + vary:
             param_options[key] = [param_options[key][0]]
     return param_options
