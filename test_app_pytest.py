@@ -7,7 +7,7 @@ import pytest
 from sklearn.pipeline import Pipeline
 
 import functions_d3__prepare_store_data_2023
-from functions_gh_presentation_and_launch import load_standard_model
+from functions_gh_presentation_and_launch import load_model
 
 debug_mode = False
 
@@ -37,7 +37,7 @@ testdata_neural_network = [
 
 @pytest.mark.parametrize("directory,selected_model,version,expected_type", testdata_standard_model)
 def test_load_standard_model(directory, selected_model, version, expected_type):
-    model = load_standard_model(selected_model, directory)
+    model = load_model(selected_model, directory)
 
     # if debug_mode:print("xgb.__version__", xgb.__version__);print(model);print(model[-1])
 
@@ -70,7 +70,7 @@ def ensure_predictions_are_valid(y_pred, y_test):
 
 @pytest.mark.parametrize("directory,selected_model,version,expected_type", testdata_neural_network)
 def test_load_neural_network(directory, selected_model, version, expected_type):
-    model = load_standard_model(selected_model, directory, model_type='neural')
+    model = load_model(selected_model, directory, model_type='neural')
 
     assert type(model) == expected_type
     return model

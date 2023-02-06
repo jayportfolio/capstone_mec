@@ -27,8 +27,8 @@ class Test(TestCase):
         ]:
             #model_path = f'models_pretrained/{selected_model}.pkl'
             #model = pickle.load(open(model_path, 'rb'))
-            from functions_gh_presentation_and_launch import load_standard_model
-            model = load_standard_model(selected_model=selected_model,model_type='neural' if 'eural' in selected_model else 'standard')
+            from functions_gh_presentation_and_launch import load_model
+            model = load_model(selected_model=selected_model, model_type='neural' if 'eural' in selected_model else 'standard')
 
         self.assertIsInstance(model, Pipeline)
 
