@@ -33,8 +33,8 @@ ALGORITHM_DETAIL = 'random search'
 #DATA_DETAIL = ['no scale','no dummies']
 #DATA_DETAIL = ['explore param']
 DATA_DETAIL = ['no dummies'] if 'catboost' in ALGORITHM.lower() else []
-#VERSION = '06'
-VERSION = '11'
+VERSION = '06'
+#VERSION = '11'
 
 RANDOM_STATE = 101
 TRAINING_SIZE = 0.9
@@ -316,6 +316,8 @@ if 'explore param' in DATA_DETAIL:
     options_block = automl_step(options_block, explore_param)
     
     ALGORITHM_DETAIL = 'grid search (implied)'
+
+OVERRIDE_N_ITER = 15
 
 param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block, debug_mode=debug_mode,
                                                                   override_cv=OVERRIDE_CV,

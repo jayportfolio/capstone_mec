@@ -33,20 +33,19 @@ def get_chosen_model(key):
         from catboost import CatBoostRegressor
         CatBoostRegressor(objective='RMSE'),
     elif key.lower() == 'stacked model':
-        modell = LinearRegression()
+        import lightgbm as lgb
+        from lightgbm import LGBMRegressor
+
+        model_lr = LinearRegression()
         model_ridge = Ridge()
+        model_xgb = XGBRegressor()
+        model_knn = KNeighborsRegressor()
+        model_lgb = LGBMRegressor()
 
         estimators = [
-            ##("Random Forest1", load_model('optimised_model_XG Boost (tree)_v10')),
-            ##("Random Forest2", load_model('optimised_model_XG Boost (tree)_v10')),
-            # ("Random Forest2", load_model('optimised_model_CatBoost_v10(no dummies)_v10'))
-            # ("Lasso", lasso_pipeline),
-            # ("Gradient Boosting", gbdt_pipeline),
-
-            ("ridge1", model_ridge),
-            # ("Random Forest2", modell),
-            # xx("Random Forest3", load_model('optimised_model_Linear Regression (Ridge)_v11')),
-            # ("Random Forest3", modell),
+            ("knn1", model_knn),
+            ("xgb1", model_xgb),
+            ("lgb1", model_lgb)
 
         ]
 

@@ -1,0 +1,41 @@
+{
+    "stacked model (v11)": {
+        "Mean Absolute Error Accuracy": 63196.02071582842,
+        "Mean Squared Error Accuracy": 6019153406.9111,
+        "R square Accuracy": 0.4671620686530755,
+        "Root Mean Squared Error": 77583.20312355697,
+        "_method": "random search",
+        "_params": {
+            "model__ridge1__alpha": 100,
+            "model__ridge1__copy_X": true,
+            "model__ridge1__fit_intercept": true,
+            "model__ridge1__max_iter": 1000,
+            "model__ridge1__positive": false,
+            "model__ridge1__random_state": 101,
+            "model__ridge1__solver": "lsqr",
+            "model__ridge1__tol": 1e-05
+        },
+        "_score": 0.4671620686530755,
+        "_train time": 0.6699059009552002,
+        "best is shared": false,
+        "best method": "random search",
+        "best params": {
+            "model__ridge1__alpha": 100,
+            "model__ridge1__copy_X": true,
+            "model__ridge1__fit_intercept": true,
+            "model__ridge1__max_iter": 1000,
+            "model__ridge1__positive": false,
+            "model__ridge1__random_state": 101,
+            "model__ridge1__solver": "lsqr",
+            "model__ridge1__tol": 1e-05
+        },
+        "best run date": "2023-02-06 21:14:08.048337",
+        "best score": 0.4671620686530755,
+        "best time": 0.6699059009552002,
+        "date": "2023-02-06 21:14:08.048337",
+        "first run": "2023-02-06 21:14:08.048445",
+        "random_state": 101,
+        "run_env": "gradient",
+        "suboptimal": "pending"
+    }
+}
