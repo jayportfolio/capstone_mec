@@ -77,15 +77,13 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
             y_test = np.loadtxt(f"train_test/y_test_v{VERSION}.csv", delimiter=",")
             #feature_names = np.loadtxt(f"train_test/feature_names_v{VERSION}.csv", delimiter=",")
             feature_names_str = np.genfromtxt(f"train_test/feature_names_v{VERSION}.csv",dtype='str')
-            #print("feature_names")
-            #print(type(feature_names_str))
-            #print(feature_names_str)
-            #print("000000", str(feature_names_str))
+
             x = str(feature_names_str)
-            #print("x0",type(x), x)
-            x = x[2:-2].replace("' '"," ")
-            #print("x1",type(x), x)
+            #x = x[2:-2].replace("' '"," ")
+            x = x.replace("' '"," ").replace("['","").replace("']","")
+
             feature_names = x.split(',')
+            feature_names = [each.replace("'","") for each in feature_names]
             #print("feature_names",type(feature_names), feature_names)
         elif not test_data_only:
             print('getting suffix test data', VERSION)

@@ -24,11 +24,12 @@ previous_data_version = DATA_VERSION
 
 prediction_models = {
     'XG Boost (data version 11) - Best model': 'optimised_model_XG Boost (tree)_v11',
-    'Stacked Model - still in beta': 'optimised_model_Stacked Model_v11',
+    'Stacked Model (data version 6) - Great model': 'optimised_model_Stacked Model_v06',
     'XG Boost (data version 10) - Good model': 'optimised_model_XG Boost (tree)_v10',
     'KNN (data version 6) - Fastest to train, Good model': 'optimised_model_KNN_v06',
     'Catboost (data version 6) - Good model': 'optimised_model_CatBoost_v06',
     'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
+    'Stacked Model - still in beta (data version 11)': 'optimised_model_Stacked Model_v11',
     'Random Forests (data version 9) - Fair model': 'optimised_model_Random Forest_v09',
     'Neural Network (data version 11) - Mediocre model': 'optimised_neural network m16 mega + dropout (v11)_v11',
     'Linear Regression (data version 11) - Poor model': 'optimised_model_Linear Regression (Ridge)_v11',
@@ -206,7 +207,7 @@ def update_about_property(feature_names, rand_index, random_instance):
     print("rand_index", rand_index)
     print("random_instance", random_instance)
     print("random_instance[0]", len(random_instance[0]))
-    print("feature_names", len(feature_names))
+    print("feature_names", len(feature_names), feature_names[0], '...', feature_names[-1])
     random_instance_df = pd.DataFrame(random_instance[0], index=feature_names)
     random_instance_df.columns = ['random=' + str(rand_index)]
     st.sidebar.table(random_instance_df)
