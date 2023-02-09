@@ -14,6 +14,10 @@ from functions_b__get_the_data_2023 import get_source_dataframe
 from functions_d3__prepare_store_data_2023 import this_test_data
 from functions_gh_presentation_and_launch import load_model
 
+RAND_INDEX_CSV = "rand_index.csv"
+#RANDOM_INSTANCE_CSV = "random_instance.csv"
+RANDOM_INSTANCE_PLUS_CSV = "random_instance_plus.csv"
+
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 df, X_test, y_test, feature_names = None, None, None, None
@@ -56,7 +60,7 @@ def main():
     selected_model_key = st.selectbox('Which model do you want to use?', available_models)
 
     selected_model = prediction_models[selected_model_key]
-    model = load_model(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
+    model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
 
     # manual_parameters = st.checkbox('Use manual parameters instead of sample')
     manual_parameters = False
@@ -94,7 +98,7 @@ def main():
         if not manual_parameters:
             try:
                 raise InterruptedError("don't ever do this actually")
-                random_instance_plus = np.loadtxt("random_instance_plus.csv", delimiter=",")
+                random_instance_plus = np.loadtxt(RANDOM_INSTANCE_PLUS_CSV, delimiter=",")
                 print("random_instance_plus:", random_instance_plus)
                 rand_index = int(random_instance_plus[0])
                 print("rand_index:", rand_index)
@@ -108,7 +112,7 @@ def main():
             except:
                 try:
                     print("trying to get old rand_index of", rand_index)
-                    rand_index_arr = np.loadtxt("rand_index.csv", delimiter=",")
+                    rand_index_arr = np.loadtxt(RAND_INDEX_CSV, delimiter=",")
                     print("found old rand_index", rand_index_arr)
                     rand_index = int(rand_index_arr)
                     print("loaded old rand_index of", rand_index)
@@ -116,7 +120,7 @@ def main():
                     print("couldn't retrieve the old rand_index, generating a new one")
                     rand_index = random.randint(0, test_size - 1)
                     print("new rand_index is", rand_index)
-                    np.savetxt("rand_index.csv", [rand_index], delimiter=",")
+                    np.savetxt(RAND_INDEX_CSV, [rand_index], delimiter=",")
                     print("saved new rand_index of", rand_index)
 
                 DATA_VERSION = selected_model[-2:]
@@ -127,10 +131,10 @@ def main():
                 random_instance = [X_test[rand_index]]
                 inputs = random_instance
                 expected = y_test[rand_index]
-                np.savetxt("random_instance.csv", random_instance, delimiter=",")
+                #np.savetxt(RANDOM_INSTANCE_CSV, random_instance, delimiter=",")
                 random_instance_plus = [rand_index, expected]
                 random_instance_plus.extend(random_instance[0])
-                np.savetxt("random_instance_plus.csv", random_instance_plus, delimiter=",")
+                np.savetxt(RANDOM_INSTANCE_PLUS_CSV, random_instance_plus, delimiter=",")
 
             update_about_property(feature_names, rand_index, random_instance)
 
@@ -141,16 +145,20 @@ def main():
         # print("inputs:", len(inputs[0]))
 
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+        model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
+
         fake_X = [[0]*len(X_test[0]),]
         #result = model.predict(fake_X)
-        result = model.predict(X_test)
+
+        #result = model.predict(X_test)
+        result = model.predict(random_instance)
         updated_res = result.flatten().astype(float)
         st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]))
         st.warning('The actual price for this property is £{:.0f}'.format(expected))
 
         fig, ax = plt.subplots()
-        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
-        model = load_model(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
+        # X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+        # model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
         y_pred = model.predict(X_test).flatten()
 
         if 'eural' in selected_model_key:
@@ -218,16 +226,21 @@ def randomise_property(DATA_VERSION, test_size):
     rand_index = random.randint(0, test_size - 1)
     X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
     random_instance = [X_test[rand_index]]
-    np.savetxt("random_instance.csv", random_instance, delimiter=",")
+    #np.savetxt(RANDOM_INSTANCE_CSV, random_instance, delimiter=",")
     expected = y_test[rand_index]
-    np.savetxt("random_instance.csv", random_instance, delimiter=",")
+    #np.savetxt(RANDOM_INSTANCE_CSV, random_instance, delimiter=",")
     random_instance_plus = [rand_index, expected]
     random_instance_plus.extend(random_instance[0])
     print("random_instance_plus:", random_instance_plus)
-    np.savetxt("random_instance_plus.csv", [random_instance_plus], delimiter=",")
-    np.savetxt("rand_index.csv", [rand_index], delimiter=",")
+    np.savetxt(RANDOM_INSTANCE_PLUS_CSV, [random_instance_plus], delimiter=",")
+    np.savetxt(RAND_INDEX_CSV, [rand_index], delimiter=",")
 
     return rand_index, random_instance, random_instance[0]
+
+
+#@st.cache
+def load_model_wrapper(selected_model, model_type): # , directory='./models_pretrained'
+    return load_model(selected_model, model_type=model_type)
 
 
 if __name__ == '__main__':

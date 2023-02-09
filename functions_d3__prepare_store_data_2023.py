@@ -71,12 +71,12 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
     try:
         if versioned:
             print('getting test data for version', VERSION)
-            #X_train = np.loadtxt(f"train_test/X_train_v{VERSION}.csv", delimiter=",")
-            #y_train = np.loadtxt(f"train_test/y_train_v{VERSION}.csv", delimiter=",")
-            X_test = np.loadtxt(f"train_test/X_test_v{VERSION}.csv", delimiter=",")
-            y_test = np.loadtxt(f"train_test/y_test_v{VERSION}.csv", delimiter=",")
-            #feature_names = np.loadtxt(f"train_test/feature_names_v{VERSION}.csv", delimiter=",")
-            feature_names_str = np.genfromtxt(f"train_test/feature_names_v{VERSION}.csv",dtype='str')
+            #X_train = np.loadtxt(f"webapp_deployment/cache/X_train_v{VERSION}.csv", delimiter=",")
+            #y_train = np.loadtxt(f"webapp_deployment/cache/y_train_v{VERSION}.csv", delimiter=",")
+            X_test = np.loadtxt(f"webapp_deployment/cache/X_test_v{VERSION}.csv", delimiter=",")
+            y_test = np.loadtxt(f"webapp_deployment/cache/y_test_v{VERSION}.csv", delimiter=",")
+            #feature_names = np.loadtxt(f"webapp_deployment/cache/feature_names_v{VERSION}.csv", delimiter=",")
+            feature_names_str = np.genfromtxt(f"webapp_deployment/cache/feature_names_v{VERSION}.csv",dtype='str')
 
             x = str(feature_names_str)
             #x = x[2:-2].replace("' '"," ")
@@ -87,10 +87,10 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
             #print("feature_names",type(feature_names), feature_names)
         elif not test_data_only:
             print('getting suffix test data', VERSION)
-            X_train = np.loadtxt(f"train_test/X_train{suffix}.csv", delimiter=",")
-            y_train = np.loadtxt(f"train_test/y_train{suffix}.csv", delimiter=",")
-            X_test = np.loadtxt(f"train_test/X_test{suffix}.csv", delimiter=",")
-            y_test = np.loadtxt(f"train_test/y_test{suffix}.csv", delimiter=",")
+            X_train = np.loadtxt(f"webapp_deployment/cache/X_train{suffix}.csv", delimiter=",")
+            y_train = np.loadtxt(f"webapp_deployment/cache/y_train{suffix}.csv", delimiter=",")
+            X_test = np.loadtxt(f"webapp_deployment/cache/X_test{suffix}.csv", delimiter=",")
+            y_test = np.loadtxt(f"webapp_deployment/cache/y_test{suffix}.csv", delimiter=",")
     except Exception as e:
         print('ENDED UP IN GENERAL EXCEPTION', e)
         print(e)
@@ -111,24 +111,24 @@ def this_test_data(VERSION, test_data_only=False, drop_nulls=True, cloud_or_weba
 
         if versioned:
             if not test_data_only:
-                np.savetxt(f"train_test/X_train_v{VERSION}.csv", X_train, delimiter=",", fmt="%f")
-                np.savetxt(f"train_test/y_train_v{VERSION}.csv", y_train, delimiter=",", fmt="%f")
-            np.savetxt(f"train_test/X_test_v{VERSION}.csv", X_test, delimiter=",", fmt="%f")
-            np.savetxt(f"train_test/y_test_v{VERSION}.csv", y_test, delimiter=",", fmt="%f")
-            np.savetxt(f"train_test/feature_names_v{VERSION}.csv", [feature_names], delimiter=",", fmt="%s")
+                np.savetxt(f"webapp_deployment/cache/X_train_v{VERSION}.csv", X_train, delimiter=",", fmt="%f")
+                np.savetxt(f"webapp_deployment/cache/y_train_v{VERSION}.csv", y_train, delimiter=",", fmt="%f")
+            np.savetxt(f"webapp_deployment/cache/X_test_v{VERSION}.csv", X_test, delimiter=",", fmt="%f")
+            np.savetxt(f"webapp_deployment/cache/y_test_v{VERSION}.csv", y_test, delimiter=",", fmt="%f")
+            np.savetxt(f"webapp_deployment/cache/feature_names_v{VERSION}.csv", [feature_names], delimiter=",", fmt="%s")
         else:
             if not test_data_only:
                 suffix = '_no_nulls' if drop_nulls else ''
                 print('suffix:', suffix)
-                print('text:', f"train_test/X_train{suffix}.csv")
+                print('text:', f"webapp_deployment/cache/X_train{suffix}.csv")
                 print()
                 print(X_train)
                 print()
-                np.savetxt("train_test/X_train_no_nulls.csv", X_train, delimiter=",")
-                np.savetxt(f"train_test/y_train{suffix}.csv", y_train, delimiter=",")
+                np.savetxt("webapp_deployment/cache/X_train_no_nulls.csv", X_train, delimiter=",")
+                np.savetxt(f"webapp_deployment/cache/y_train{suffix}.csv", y_train, delimiter=",")
 
-            np.savetxt(f"train_test/X_test{suffix}.csv", X_test, delimiter=",")
-            np.savetxt(f"train_test/y_test{suffix}.csv", y_test, delimiter=",")
+            np.savetxt(f"webapp_deployment/cache/X_test{suffix}.csv", X_test, delimiter=",")
+            np.savetxt(f"webapp_deployment/cache/y_test{suffix}.csv", y_test, delimiter=",")
 
     if not test_data_only:
         return X_train, X_test, y_train, y_test
