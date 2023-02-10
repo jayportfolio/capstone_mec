@@ -1,14 +1,13 @@
 import pickle
 from datetime import datetime, timedelta
 
-import keras
-import numpy as np
 import pytest
+
+import keras
 from sklearn.pipeline import Pipeline
 
-import utility_functions.functions_d3__prepare_store_data
-from utility_functions.functions_gh_presentation_and_launch import load_model
 from utility_functions.functions_d3__prepare_store_data import this_test_data
+from utility_functions.functions_gh_presentation_and_launch import load_model
 
 debug_mode = False
 
@@ -23,7 +22,7 @@ for each in [
     'optimised_model_XG Boost (tree)_v10',
     'optimised_model_XG Boost (tree)_v11',
 ]:
-    testdata_standard_model.append(("models_pretrained", each, each[-2:], Pipeline))
+    testdata_standard_model.append(("model/webapp_final_models", each, each[-2:], Pipeline))
 
 testdata_neural_network = [
     # ("models_pretrained", "optimised_model_Neural Network_v06", '06', keras.models.Sequential),
@@ -33,7 +32,7 @@ testdata_neural_network = [
     # ("models", "optimised_model_Neural Network m12 mega_v06", '06', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m15 mega + dropout_v09", '09', keras.models.Sequential)
     # ?? ("models_pretrained", "optimised_neural network m15 mega + dropout (v09)_v09", '09', keras.models.Sequential)
-    ("models_pretrained", "optimised_neural network m16 mega + dropout (v11)_v11", '11', keras.models.Sequential)
+    ("model/webapp_final_models", "optimised_neural network m16 mega + dropout (v11)_v11", '11', keras.models.Sequential)
 ]
 
 
@@ -82,7 +81,7 @@ def test_load_neural_network(directory, selected_model, version, expected_type):
 def test_predict_using_neural_network(directory, selected_model, version, expected_type):
     model = test_load_neural_network(directory, selected_model, version, expected_type)
 
-    X_test, y_test, feature_names = utility_functions.functions_d3__prepare_store_data.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+    X_test, y_test, feature_names = this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
 
     debug_mode = False
     if debug_mode:
