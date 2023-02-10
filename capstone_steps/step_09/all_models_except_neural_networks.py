@@ -827,7 +827,7 @@ crossval_runner.best_estimator_  if not using_catboost else ''
 
 
 if this_model_is_best:
-    with open(f'../../../models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    with open(f'./model_list/initial_trained_models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         if not using_catboost:
             pickle.dump(crossval_runner.best_estimator_, f)
         else:

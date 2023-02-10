@@ -22,7 +22,7 @@ for each in [
     'optimised_model_XG Boost (tree)_v10',
     'optimised_model_XG Boost (tree)_v11',
 ]:
-    testdata_standard_model.append(("model/webapp_final_models", each, each[-2:], Pipeline))
+    testdata_standard_model.append(("model_list/webapp_final_models", each, each[-2:], Pipeline))
 
 testdata_neural_network = [
     # ("models_pretrained", "optimised_model_Neural Network_v06", '06', keras.models.Sequential),
@@ -32,7 +32,7 @@ testdata_neural_network = [
     # ("models", "optimised_model_Neural Network m12 mega_v06", '06', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m15 mega + dropout_v09", '09', keras.models.Sequential)
     # ?? ("models_pretrained", "optimised_neural network m15 mega + dropout (v09)_v09", '09', keras.models.Sequential)
-    ("model/webapp_final_models", "optimised_neural network m16 mega + dropout (v11)_v11", '11', keras.models.Sequential)
+    ("model_list/webapp_final_models", "optimised_neural network m16 mega + dropout (v11)_v11", '11', keras.models.Sequential)
 ]
 
 

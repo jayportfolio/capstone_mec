@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: Decide which algorithm and version of the data we are going to use for model training
 # 
@@ -51,7 +51,7 @@ create_python_script = True
 prefix_dir_envs = './process/z_envs/'
 prefix_dir_hyperparameters = './'
 prefix_dir_results = './process/F_evaluate_model/'
-prefix_dir_optimised_models = './models/'
+prefix_dir_optimised_models = './model_list/initial_trained_models/'
 prefix_functions_root = os.path.join('.')
 prefix_dir_results_root = './process/F_evaluate_model'
 prefix_dir_results_root2 = './process/F_evaluate_model/'
@@ -167,7 +167,7 @@ if running_locally:
     if ALGORITHM.lower() in ['random forest','xg boost','xg boost (linear)','xg boost (tree)' ]:
         OVERRIDE_N_ITER = 3
     elif 'linear regression' in ALGORITHM.lower():
-        OVERRIDE_N_ITER = 15
+        OVERRIDE_N_ITER = 4 # 15
     else:
         OVERRIDE_N_ITER = 5
 
@@ -178,7 +178,7 @@ if 'forest' in ALGORITHM.lower() or True:
     OVERRIDE_VERBOSE = 2
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: defining the model pipeline
 # 
@@ -203,7 +203,7 @@ starter_pipe = make_pipeline()
 starter_pipe
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: get the data
 
@@ -287,7 +287,7 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape, X_train_index.sh
 starter_model = starter_pipe[-1]
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage:
 # * #### retrieve the hyperparameters for this model, and
@@ -325,17 +325,9 @@ param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block,
                                                                   )
 
 
-if not using_catboost and len(param_options.keys()) > 2 and not already_timed and debug_mode:
-    already_timed = True
-    get_ipython().run_line_magic('timeit', 'starter_pipe.fit(X_train, y_train)')
-
-
 print("cv:", cv, "n_jobs:", n_jobs, "refit:", refit, "n_iter:", n_iter, "verbose:", verbose)
 #print('\n\nHyperparameters:')
 #param_options if not using_catboost else options_block
-
-
-# In[ ]:
 
 
 key = f'{ALGORITHM} (v{VERSION})'.lower()
@@ -486,21 +478,15 @@ else:
 crossval_runner
 
 
-# In[ ]:
-
-
 if ALGORITHM_DETAIL == 'grid search' or ALGORITHM_DETAIL == 'grid search (implied)':
     print(crossval_runner.best_params_)
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: Get the results and print some graphs
 # 
 # 
-
-# In[ ]:
-
 
 if not using_catboost:
     best_estimator_pipe = crossval_runner.best_estimator_
@@ -515,9 +501,6 @@ if not using_catboost:
 else:
     print(cat_params)
     print(cat_cv_results)
-
-
-# In[ ]:
 
 
 if not using_catboost:
@@ -549,22 +532,16 @@ if not using_catboost:
     if is_jupyter:display(cv_results_df_summary)
 
 
-# <code style="background:blue;color:blue">**************</code>
+
 # 
 # #### Mini Stage: Make predictions
 # 
 # 
 
-# In[ ]:
-
-
 if not using_catboost:
     y_pred = best_estimator_pipe.predict(X_test)
 else:
     y_pred = starter_model.predict(pool_Xtest)
-
-
-# In[ ]:
 
 
 y_pred = y_pred.reshape((-1, 1))
@@ -578,9 +555,6 @@ print('R square Accuracy', R2)
 print('Mean Absolute Error Accuracy', MAE)
 print('Mean Squared Error Accuracy', MSE)
 print('Root Mean Squared Error', RMSE)
-
-
-# In[ ]:
 
 
 compare = np.hstack((y_test_index, y_test, y_pred))
@@ -600,9 +574,6 @@ combined['bedrooms'] = combined['bedrooms'].astype(int)
 combined
 
 
-# In[ ]:
-
-
 best_model_fig, best_model_ax = plt.subplots()
 best_model_ax.scatter(y_test, y_pred, edgecolors=(0, 0, 1))
 best_model_ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
@@ -611,9 +582,6 @@ best_model_ax.set_xlabel('Actual')
 #ax.title.set_text(f'CV Chosen best option ({calculated_best_pipe[1]})')
 
 plt.show()
-
-
-# In[ ]:
 
 
 if not using_catboost:
@@ -667,9 +635,6 @@ if not using_catboost:
     best_models[-1] = fitted_graph_model[-1].get_params()
     best_model_predictions[-1] = y_pred_graph
     best_model_scores[-1] = fitted_graph_model.score(X_test, y_test)
-
-
-# In[ ]:
 
 
 if not using_catboost:
@@ -728,9 +693,6 @@ if not using_catboost:
     plt.show()
 
 
-# In[ ]:
-
-
 if not using_catboost:
     sns.set_theme(font_scale=2, rc=None)
     sns.set_theme(font_scale=1, rc=None)
@@ -763,14 +725,11 @@ if not using_catboost:
     plt.show()
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: Evaluate the model
 # 
 # 
-
-# In[ ]:
-
 
 # <catboost.core.CatBoostRegressor object at 0x7fb167387490>
 # {'depth': 6}
@@ -819,13 +778,7 @@ print(key)
 new_results
 
 
-# In[ ]:
-
-
 crossval_runner.best_estimator_  if not using_catboost else ''
-
-
-# In[ ]:
 
 
 if this_model_is_best:
@@ -842,13 +795,10 @@ else:
 print(new_model_decision)
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: Investigate the feature importances (if applicable)
 # 
-
-# In[ ]:
-
 
 if model_uses_feature_importances:
     feature_importances = crossval_runner.best_estimator_[-1].feature_importances_ if not using_catboost else starter_model.get_feature_importance()
@@ -870,9 +820,6 @@ else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
 
 
-# In[ ]:
-
-
 if model_uses_feature_importances:
     indices = np.argsort(feature_importances)
 
@@ -884,12 +831,9 @@ else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
 
 
-# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+
 # 
 # ## Stage: Write the final report for this algorithm and dataset version
-
-# In[ ]:
-
 
 
 
@@ -1078,21 +1022,12 @@ def print_and_report(text_single, title):
 
 
 
-# In[ ]:
-
-
 print('Nearly finished...')
-
-
-# In[ ]:
 
 
 if create_python_script and is_jupyter:
     filename = FILENAME+'.ipynb'
     get_ipython().system('jupyter nbconvert --to script $filename')
-
-
-# In[ ]:
 
 print(f'ALGORITHM: {ALGORITHM}')
 print(f'ALGORITHM_DETAIL: {ALGORITHM_DETAIL}')
@@ -1102,9 +1037,6 @@ print(f'FILENAME: {FILENAME}')
 
 
 print('Finished!')
-
-
-# In[ ]:
 
 
 

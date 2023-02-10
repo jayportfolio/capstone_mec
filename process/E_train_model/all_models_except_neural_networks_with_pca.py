@@ -54,7 +54,7 @@ import os
 prefix_dir_envs = './process/z_envs/'
 prefix_dir_hyperparameters = './'
 prefix_dir_results = './process/F_evaluate_model/'
-prefix_dir_optimised_models = './models/'
+prefix_dir_optimised_models = './model_list/initial_trained_models/'
 prefix_functions_root = os.path.join('.')
 prefix_dir_results_root = './process/F_evaluate_model'
 
@@ -445,9 +445,6 @@ else:
 crossval_runner
 
 
-# In[ ]:
-
-
 if ALGORITHM_DETAIL == 'grid search' or ALGORITHM_DETAIL == 'grid search (implied)':
     print(crossval_runner.best_params_)
 
@@ -594,9 +591,6 @@ if not using_catboost:
     best_models[-1] = fitted_graph_model[-1].get_params()
     best_model_predictions[-1] = y_pred_graph
     best_model_scores[-1] = fitted_graph_model.score(X_test, y_test)
-
-
-# In[ ]:
 
 
 if not using_catboost:

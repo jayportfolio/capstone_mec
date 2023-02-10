@@ -258,7 +258,7 @@ def randomise_property(DATA_VERSION, test_size):
 
 
 #@st.cache
-def load_model_wrapper(selected_model, model_type): # , directory='./models_pretrained'
+def load_model_wrapper(selected_model, model_type):
     return load_model(selected_model, model_type=model_type)
 
 

@@ -1,7 +1,7 @@
 import pickle
 from tensorflow import keras
 
-def load_model(selected_model, directory='./model/webapp_final_models', model_type='standard'):
+def load_model(selected_model, directory='./model_list/webapp_final_models', model_type='standard'):
     if model_type == 'standard':
         model_path = f'{directory}/{selected_model}.pkl'
         model = pickle.load(open(model_path, 'rb'))

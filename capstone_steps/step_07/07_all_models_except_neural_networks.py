@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: Decide which algorithm and version of the data we are going to use for model training
 # 
 # Additionally, choose:
@@ -9,10 +11,13 @@
 # * what fraction of the data we'll use for testing (0.1)
 # * if the data split will be randomised (it won't!)
 
+# In[73]:
+
+
 FILENAME = '07_all_models_except_neural_networks'
 
-#ALGORITHM = 'Linear Regression (Ridge)'
 ALGORITHM = 'XG Boost (tree)'
+ALGORITHM = 'Linear Regression (Ridge)'
 
 ALGORITHM_DETAIL = 'random search'
 DATA_DETAIL = []
@@ -25,25 +30,39 @@ CROSS_VALIDATION_SCORING = 'r2'
 
 print(f'ALGORITHM: {ALGORITHM}')
 print(f'ALGORITHM_DETAIL: {ALGORITHM_DETAIL}')
-print(f'DATA VERSION: {VERSION}')
+print(f'DATA VERSIONdiagr: {VERSION}')
 print(f'DATA_DETAIL: {DATA_DETAIL}')
 
 model_uses_feature_importances = 'tree' in ALGORITHM.lower() or 'forest' in ALGORITHM.lower() or 'boost' in ALGORITHM.lower()
 create_python_script = True
 
+prefix_dir_envs = './process/z_envs/'
+prefix_dir_hyperparameters = './'
+prefix_dir_results = '../F_evaluate_model/'
+prefix_dir_optimised_models = './model_list/initial_trained_models/'
+prefix_functions_root = os.path.join('.')
+prefix_dir_results_root = 'results/'
 
+
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: loading all dependencies
 # 
 # 
 
+# In[74]:
+
+
+from sklearn.impute import SimpleImputer
 import pandas as pd
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, GridSearchCV
 import numpy as np
 from pandas import DataFrame
 import math
 from termcolor import colored
 from time import time
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+import sklearn
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.metrics import r2_score
 import seaborn as sns
 import pickle
@@ -57,6 +76,10 @@ import os
 start_timestamp = datetime.now()
 
 module_path = os.path.abspath(os.path.join('..', '..'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+module_path = os.path.abspath(os.path.join('..', '..','utility_functions'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 
@@ -99,17 +122,33 @@ else:
     cloud_run = True
 
 from utility_functions.functions_0__common import get_columns
-from utility_functions.functions_b__get_the_data import get_source_dataframe
+from utility_functions.functions_b__get_the_data import get_combined_dataset, get_source_dataframe
 from utility_functions.functions_d1__prepare_cleanse_data import tidy_dataset
 from utility_functions.functions_d2__transform_enrich_data import preprocess, feature_engineer
 from utility_functions.functions_d3__prepare_store_data import create_train_test_data
-from utility_functions.functions_e__train_model import get_chosen_model, get_cv_params, get_hyperparameters
-from utility_functions.functions_f_evaluate_model import get_results, update_results
+from utility_functions.functions_e__train_model import get_chosen_model, make_modelling_pipeline, get_cv_params, fit_model_with_cross_validation, get_hyperparameters
+from utility_functions.functions_f_evaluate_model import get_best_estimator_average_time, get_results, update_results
 
 print(env_vars)
 
 
+# In[75]:
+
+
+if is_jupyter:
+    get_ipython().run_line_magic('pip', 'install tabulate')
+
+    if ALGORITHM == 'CatBoost':
+        get_ipython().run_line_magic('pip', 'install catboost')
+
+    if ALGORITHM == 'Light Gradient Boosting':
+        get_ipython().run_line_magic('pip', 'install lightgbm')
+
+
 # #### Include any overrides specific to the algorthm / python environment being used
+
+# In[76]:
+
 
 running_locally = run_env == 'local'
 
@@ -123,9 +162,9 @@ if running_locally:
     if ALGORITHM.lower() in ['random forest','xg boost','xg boost (linear)','xg boost (tree)' ]:
         OVERRIDE_N_ITER = 3
     elif 'linear regression' in ALGORITHM.lower():
-        OVERRIDE_N_ITER = 15
+        OVERRIDE_N_ITER = 4 # 15
     else:
-        OVERRIDE_N_ITER = 5
+        OVERRIDE_N_ITER = 3
 
 #if ALGORITHM.lower() in ['xg boost','xg boost (linear)','xg boost (tree)']:
 #        OVERRIDE_N_ITER = 20
@@ -134,12 +173,17 @@ if running_locally:
 #    OVERRIDE_VERBOSE = 2
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: defining the model pipeline
 # 
 # 
 
+# In[77]:
+
+
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
 def make_pipeline():
@@ -153,13 +197,22 @@ starter_pipe = make_pipeline()
 starter_pipe
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: get the data
+
+# In[78]:
+
 
 columns, booleans, floats, categories, custom, wildcard = get_columns(version=VERSION)
 LABEL = 'Price'
 
 
-df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
+# In[79]:
+
+
+#df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
+df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../', row_limit=None)
 df_orig = df.copy()
 
 if retrieval_type != 'tidy':
@@ -170,16 +223,28 @@ if retrieval_type != 'tidy':
     df = df[columns]
 
 
+# In[80]:
+
+
 print(colored(f"features", "blue"), "-> ", columns)
 columns.insert(0, LABEL)
 print(colored(f"label", "green", None, ['bold']), "-> ", LABEL)
+
+
+# In[81]:
 
 
 df = preprocess(df, version=VERSION)
 df = df.dropna()
 
 
+# In[82]:
+
+
 df.head(5)
+
+
+# In[83]:
 
 
 X_train, X_test, y_train, y_test, X_train_index, X_test_index, y_train_index, y_test_index, df_features, df_labels = create_train_test_data(
@@ -201,14 +266,22 @@ print(X_train.shape, X_test.shape, y_train.shape, y_test.shape, X_train_index.sh
 
 
 
+# In[84]:
+
+
 starter_model = starter_pipe[-1]
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage:
 # * #### retrieve the hyperparameters for this model, and
 # * #### train the model
 # 
 # 
+
+# In[85]:
+
 
 options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix='../../')
 
@@ -221,6 +294,9 @@ param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block,
 
 
 print("cv:", cv, "n_jobs:", n_jobs, "refit:", refit, "n_iter:", n_iter, "verbose:", verbose)
+
+
+# In[86]:
 
 
 def fit_model_with_cross_validation(gs, X_train, y_train, fits):
@@ -257,19 +333,31 @@ cv_average_fit_time, cv_best_model_fit_time, total_fits = fit_model_with_cross_v
 crossval_runner
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: Get the results and print some graphs
 # 
 # 
 
-best_estimator_pipe = crossval_runner.best_estimator_
-cv_results_df = pd.DataFrame(crossval_runner.cv_results_).sort_values('rank_test_score')
+# In[87]:
 
-print("Best Params\n",crossval_runner.best_params_, "\n---------------------")
 
-if debug_mode:
-    print("CV results\n",crossval_runner.cv_results_, "\n---------------------")
-    #print("Best Params\n",crossval_runner["best_params_"], "\n---------------------")
+if not using_catboost:
+    best_estimator_pipe = crossval_runner.best_estimator_
+    cv_results_df = pd.DataFrame(crossval_runner.cv_results_).sort_values('rank_test_score')
 
+    print("Best Params\n",crossval_runner.best_params_, "\n---------------------")
+
+    if debug_mode:
+        print("CV results\n",crossval_runner.cv_results_, "\n---------------------")
+        #print("Best Params\n",crossval_runner["best_params_"], "\n---------------------")
+
+else:
+    print(cat_params)
+    print(cat_cv_results)
+
+
+# In[88]:
 
 
 key = f'{ALGORITHM} (v{VERSION})'.lower()
@@ -287,24 +375,39 @@ if not using_catboost:
         print(-len(cv_results_df_sorted) + len(cv_results_df_full_sorted), "fits were total failures")
         total_fits = len(cv_results_df_sorted)
 
+if not using_catboost:
+    if is_jupyter:display(cv_results_df_sorted)
 
-orig_debug_mode, orig_display_df_cols = debug_mode, pd.get_option('display.max_columns')
-debug_mode = True
-pd.set_option('display.max_columns', None)
-if debug_mode:
-    debug_cols = ['rank_test_score', 'mean_test_score', 'mean_fit_time', 'mean_score_time']
-    debug_cols.extend([c for c in cv_results_df.columns if 'param' in c and c != 'params'])
+    orig_debug_mode, orig_display_df_cols = debug_mode, pd.get_option('display.max_columns')
+    debug_mode = True
+    pd.set_option('display.max_columns', None)
+    if debug_mode:
+        debug_cols = ['rank_test_score', 'mean_test_score', 'mean_fit_time', 'mean_score_time']
+        debug_cols.extend([c for c in cv_results_df.columns if 'param' in c and c != 'params'])
 
-cv_results_df_summary = cv_results_df[debug_cols].head(7)
-cv_results_df_summary.set_index('rank_test_score', inplace=True)
+    cv_results_df_summary = cv_results_df[debug_cols].head(7)
+    cv_results_df_summary.set_index('rank_test_score', inplace=True)
+
+    if is_jupyter:display(cv_results_df_summary)
 
 
-
+# <code style="background:blue;color:blue">**************</code>
+# 
 # #### Mini Stage: Make predictions
 # 
 # 
 
-y_pred = best_estimator_pipe.predict(X_test)
+# In[89]:
+
+
+if not using_catboost:
+    y_pred = best_estimator_pipe.predict(X_test)
+else:
+    y_pred = starter_model.predict(pool_Xtest)
+
+
+# In[90]:
+
 
 y_pred = y_pred.reshape((-1, 1))
 
@@ -317,6 +420,9 @@ print('R square Accuracy', R2)
 print('Mean Absolute Error Accuracy', MAE)
 print('Mean Squared Error Accuracy', MSE)
 print('Root Mean Squared Error', RMSE)
+
+
+# In[91]:
 
 
 compare = np.hstack((y_test_index, y_test, y_pred))
@@ -336,6 +442,9 @@ combined['bedrooms'] = combined['bedrooms'].astype(int)
 combined
 
 
+# In[92]:
+
+
 best_model_fig, best_model_ax = plt.subplots()
 best_model_ax.scatter(y_test, y_pred, edgecolors=(0, 0, 1))
 best_model_ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=3)
@@ -344,6 +453,9 @@ best_model_ax.set_xlabel('Actual')
 #ax.title.set_text(f'CV Chosen best option ({calculated_best_pipe[1]})')
 
 plt.show()
+
+
+# In[93]:
 
 
 if not using_catboost:
@@ -399,6 +511,9 @@ if not using_catboost:
     best_model_scores[-1] = fitted_graph_model.score(X_test, y_test)
 
 
+# In[94]:
+
+
 if not using_catboost:
     evolution_of_models_fig, evolution_of_models_axes = plt.subplots(nrows=len(best_model_scores.keys()), figsize=(15, 45))
 
@@ -432,38 +547,49 @@ if not using_catboost:
     plt.show()
 
 
-sns.set_theme(font_scale=2, rc=None)
-sns.set_theme(font_scale=1, rc=None)
-
-worst_and_best_model_fig, axes = plt.subplots(ncols=3, figsize=(15, 5))
-
-plt.subplots_adjust(hspace=0.2)
-plt.subplots_adjust(wspace=0.2)
-
-coordinates = axes[0]
-sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[0], color='red')
-sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[0],
-                s=100).set(title=f'"BEST" model')
-
-sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[1], color='red')
-sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[-1].flatten(), ax=axes[1],
-                s=100).set(title=f'"WORST" model')
-
-sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[2], color='red')
-sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[-1].flatten(), ax=axes[2],
-                s=120, color='orange')
-sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[2],
-                s=30, alpha=0.6, color='black').set(
-    title='best (black) vs worst (orange)')
+# In[95]:
 
 
-worst_and_best_model_fig.tight_layout()
-plt.show()
+if not using_catboost:
+    sns.set_theme(font_scale=2, rc=None)
+    sns.set_theme(font_scale=1, rc=None)
+
+    worst_and_best_model_fig, axes = plt.subplots(ncols=3, figsize=(15, 5))
+
+    plt.subplots_adjust(hspace=0.2)
+    plt.subplots_adjust(wspace=0.2)
+
+    #.flatten()
+    coordinates = axes[0]
+    sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[0], color='red')
+    sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[0],
+                    s=100).set(title=f'"BEST" model')
+
+    sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[1], color='red')
+    sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[-1].flatten(), ax=axes[1],
+                    s=100).set(title=f'"WORST" model')
+
+    sns.lineplot(x=[y_test.min(), y_test.max()], y=[y_test.min(), y_test.max()], ax=axes[2], color='red')
+    sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[-1].flatten(), ax=axes[2],
+                    s=120, color='orange')
+    sns.scatterplot(x=y_test.flatten(), y=best_model_predictions[0].flatten(), ax=axes[2],
+                    s=30, alpha=0.6, color='black').set(
+        title='best (black) vs worst (orange)')
+    #title='best (orange) vs worst (black)')
 
 
+    worst_and_best_model_fig.tight_layout()
+    plt.show()
+
+
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: Evaluate the model
 # 
 # 
+
+# In[96]:
+
 
 cv_best_model_fit_time = cv_best_model_fit_time if not using_catboost else 999
 
@@ -480,7 +606,7 @@ new_results = {
     '_train time': cv_best_model_fit_time,
     'random_state': RANDOM_STATE,
     'date': str(datetime.now()),
-    '_params': crossval_runner.best_params_,
+    '_params': crossval_runner.best_params_ if not using_catboost else cat_params,
     '_method':method,
     'run_env': run_env
 }
@@ -492,17 +618,24 @@ if run_env not in ['colab']:
     except:
         print(f"haven't scored this model yet: {ALGORITHM}")
         old_best_score = -999
-    this_model_is_best = update_results(old_results_json, new_results, key, directory='../../results/')
-
+    #this_model_is_best = update_results(old_results_json, new_results, key, directory='../../results/')
+    this_model_is_best = update_results(old_results_json, new_results, key, directory=prefix_dir_results_root)
+#jhjh
 print(key)
 new_results
+
+
+# In[97]:
 
 
 crossval_runner.best_estimator_  if not using_catboost else ''
 
 
+# In[98]:
+
+
 if this_model_is_best:
-    with open(f'../../../models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    with open(f'../../model_list/initial_trained_models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         if not using_catboost:
             pickle.dump(crossval_runner.best_estimator_, f)
         else:
@@ -515,8 +648,13 @@ else:
 print(new_model_decision)
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: Investigate the feature importances (if applicable)
 # 
+
+# In[99]:
+
 
 if model_uses_feature_importances:
     feature_importances = crossval_runner.best_estimator_[-1].feature_importances_ if not using_catboost else starter_model.get_feature_importance()
@@ -537,6 +675,9 @@ else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
 
 
+# In[100]:
+
+
 if model_uses_feature_importances:
     indices = np.argsort(feature_importances)
 
@@ -548,17 +689,25 @@ else:
     print(f'{ALGORITHM} does not have feature_importances, skipping')
 
 
+# <code style="background:blue;color:blue">**********************************************************************************************************</code>
+# 
 # ## Stage: Write the final report for this algorithm and dataset version
+
+# In[102]:
+
 
 from bs4 import BeautifulSoup
 
 
 def include_in_html_report(type, section_header=None, section_figure=None, section_content=None, section_content_list=None):
 
+    # writePath_html = r'model_results/%s (html).html' % key
+    # writePath_md = r'model_results/%s (md).md' % key
     results_root = '../../process/F_evaluate_model'
     writePath_html = f'{results_root}/html/{key}.html'.replace(" ", "_").replace("(", "_").replace(")", "_")
     writePath_md = f'{results_root}/markdown/{key}.md'
 
+#isinstance(ini_list2, list)
     if not section_content_list:
         section_content_list = [section_content]
 
@@ -671,7 +820,7 @@ if model_uses_feature_importances:
 include_in_html_report("header", section_content=f"Comparison with other models", section_figure=2)
 
 
-dff = pd.read_json('../../results/results.json')
+dff = pd.read_json('results/results.json')
 
 version = VERSION
 
@@ -699,4 +848,35 @@ if not using_catboost:
 include_in_html_report(type="dict", section_header="Environment Variables", section_content=env_vars)
 
 
+def print_and_report(text_single, title):
+    include_in_html_report("text", section_content=title)
+    for each in text_single:
+        print(each)
+        include_in_html_report("text", section_header="", section_content=each)
+
+
+# In[ ]:
+
+
+print('Nearly finished...')
+
+
+# In[ ]:
+
+
+if create_python_script and is_jupyter:
+    filename = FILENAME+'.ipynb'
+    get_ipython().system('jupyter nbconvert --to script $filename')
+
+
+# In[ ]:
+
+
 print('Finished!')
+
+
+# In[ ]:
+
+
+
+

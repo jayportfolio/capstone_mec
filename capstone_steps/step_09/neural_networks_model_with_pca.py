@@ -926,7 +926,7 @@ print(ALGORITHM_DETAIL)
 latest_score = old_results_json[key]['_score']
 
 if this_model_is_best and latest_score > 0.55:
-    with open(f'../../../models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    with open(f'./model_list/initial_trained_models/optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
         pickle.dump(trainable_model, f)
         new_model_decision = f"pickled new version of model\n{latest_score} is new best score (it's better than {old_best_score})"
         #print(results_json[key]['_score'], 'is an improvement on', results_json[key]['second best score'])

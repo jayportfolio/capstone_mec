@@ -28,9 +28,10 @@ prefix_dir_data = './'
 prefix_dir_envs = './process/z_envs/'
 prefix_dir_hyperparameters = './'
 prefix_dir_results = './process/F_evaluate_model/'
-prefix_dir_optimised_models = './models/'
+prefix_dir_optimised_models = './model_list/initial_trained_models/'
 prefix_functions_root = os.path.join('.')
 prefix_dir_results_root = './process/F_evaluate_model'
+prefix_dir_results_root2 = './process/F_evaluate_model/'
 
 force_quick_mode = False  # True
 
@@ -71,7 +72,7 @@ price_divisor = 1
 # selected_neural_network = selected_nn_code = ""
 
 # ---- 7th NEURAL NETWORK STRUCTURE DEFINITION ---- #
-#selected_neural_network = selected_nn_code = "m11 mega"
+# selected_neural_network = selected_nn_code = "m11 mega"
 
 # ---- 8th NEURAL NETWORK STRUCTURE DEFINITION ---- #
 # selected_neural_network = selected_nn_code = "m12 mega"
@@ -83,7 +84,7 @@ price_divisor = 1
 # selected_neural_network = selected_nn_code = "m14 mega"
 
 # ---- 10th NEURAL NETWORK STRUCTURE DEFINITION ---- #
-#selected_neural_network = selected_nn_code = "m15 mega + dropout"
+# selected_neural_network = selected_nn_code = "m15 mega + dropout"
 
 # ---- 11th NEURAL NETWORK STRUCTURE DEFINITION ---- #
 selected_neural_network = selected_nn_code = "m16 mega + dropout"
@@ -195,9 +196,9 @@ from keras.models import Sequential
 from keras.layers import Dense
 
 print("Tensorflow version:", tf.__version__)
-#tf.compat.v2.disable_eager_execution()
+# tf.compat.v2.disable_eager_execution()
 print("Tensorflow version:", tf.__version__)
-#raise ValueError('break here')
+# raise ValueError('break here')
 
 loss_dict = {
     "mean_squared_error": 'mse',
@@ -445,9 +446,9 @@ def make_simple_ann(key, inputs=-1):
         chosen_loss = 'mean_absolute_error'  # 'mean_squared_error'
 
     elif key == "m16 mega + dropout":
-        #input_shape=[1,], axis=None
+        # input_shape=[1,], axis=None
         normalizer = tf.keras.layers.Normalization(axis=-1)
-        #normalizer = tf.keras.layers.Normalization(input_shape=[1,], axis=-1)
+        # normalizer = tf.keras.layers.Normalization(input_shape=[1,], axis=-1)
         normalizer.adapt(np.array(X_train))
         batchnorm = layers.BatchNormalization()
         activation = layers.Activation('relu')
@@ -460,29 +461,29 @@ def make_simple_ann(key, inputs=-1):
 
         # The Hidden Layers :
         chosen_model.add(Dense(256, kernel_initializer='normal'))
-        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
+        # chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
         chosen_model.add(Dense(512, kernel_initializer='normal'))
-        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
+        # chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
 
         chosen_model.add(keras.layers.Dropout(rate=0.2))
 
         chosen_model.add(Dense(1024, kernel_initializer='normal'))
-        #chosen_model.add(layers.BatchNormalization())
-        #chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
+        # chosen_model.add(layers.BatchNormalization())
+        # chosen_model.add(layers.BatchNormalization(input_shape=[1,], axis=-1))
         chosen_model.add(activation)
         chosen_model.add(Dense(1024, kernel_initializer='normal'))
 
         chosen_model.add(keras.layers.Dropout(rate=0.2))
 
-        #chosen_model.add(layers.BatchNormalization())
+        # chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
         chosen_model.add(Dense(512, kernel_initializer='normal'))
-        #chosen_model.add(layers.BatchNormalization())
+        # chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
         chosen_model.add(Dense(256, kernel_initializer='normal'))
-        #chosen_model.add(layers.BatchNormalization())
+        # chosen_model.add(layers.BatchNormalization())
         chosen_model.add(activation)
 
         # The Output Layer :
@@ -490,7 +491,7 @@ def make_simple_ann(key, inputs=-1):
 
         learn_rate = 0.0003
         epochs = 400
-        #epochs = 60 # TODO
+        # epochs = 60 # TODO
         chosen_loss = 'mean_absolute_error'  # 'mean_squared_error'
 
     else:
@@ -649,23 +650,20 @@ def plot_loss(history):
 
 loss_fig, loss_ax = plot_loss(history)
 
-
-
 # Calling `save('my_model')` creates a SavedModel folder `my_model`.
-#trainable_model.save("my_model", save_format='t5')
-#trainable_model.save("my_model.h5")
-tf.keras.models.save_model(trainable_model, "test_model")
-
+# xxxtrainable_model.save("my_model", save_format='t5')
+# xxxtrainable_model.save("my_model.h5")
+# tf.keras.models.save_model(trainable_model, "test_model")
 # It can be used to reconstruct the model identically.
-#reconstructed_model = keras.models.load_model("my_model")
-#reconstructed_model = keras.models.load_model("my_model.h5")
-reconstructed_model = tf.keras.models.load_model("test_model")
+# xxxreconstructed_model = keras.models.load_model("my_model")
+# xxxreconstructed_model = keras.models.load_model("my_model.h5")
+# reconstructed_model = tf.keras.models.load_model("test_model")
 
 print("TRAINABLE MODEL SUMMARY")
 trainable_model.summary()
 
-print("RECONSTRUCTED MODEL SUMMARY")
-reconstructed_model.summary()
+#print("RECONSTRUCTED MODEL SUMMARY")
+#reconstructed_model.summary()
 
 print()
 print()
@@ -673,9 +671,9 @@ print("trainable_model weights", trainable_model.get_weights()[:1])
 print("reconstructed_model weights", trainable_model.get_weights()[:1])
 
 # Let's check:
-#np.testing.assert_allclose(
+# np.testing.assert_allclose(
 #    trainable_model.predict(X_test), reconstructed_model.predict(X_test)
-#)
+# )
 
 
 y_pred = trainable_model.predict(X_test)
@@ -753,7 +751,7 @@ new_results = {
 }
 
 if run_env not in ['colab']:
-    old_results_json = get_results()
+    old_results_json = get_results(directory=prefix_dir_results_root2)
     try:
         old_best_score = old_results_json[key]['best score']
     except:
@@ -767,8 +765,8 @@ print(ALGORITHM_DETAIL)
 latest_score = old_results_json[key]['_score']
 
 if this_model_is_best and latest_score > 0.55:
-    #with open(prefix_dir_optimised_models + f'optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
-        # pickle.dump(trainable_model, f)
+    # with open(prefix_dir_optimised_models + f'optimised_model_{ALGORITHM}_v{VERSION}{DD2}.pkl', 'wb') as f:
+    # pickle.dump(trainable_model, f)
     trainable_model.save(prefix_dir_optimised_models + key)
     new_model_decision = f"saved (rather than pickled) new version of model\n{latest_score} is new best score (it's better than {old_best_score})"
     # print(results_json[key]['_score'], 'is an improvement on', results_json[key]['second best score'])
@@ -780,7 +778,6 @@ else:
 print(new_model_decision)
 
 # ## Stage: Write the final report for this algorithm and dataset version
-
 
 
 end_timestamp = datetime.now()
@@ -833,11 +830,12 @@ version_models_summary = version_models_df[
 all_models_summary = all_models_df[
     ['best score', 'best time', 'Mean Absolute Error Accuracy', 'Mean Squared Error Accuracy', 'R square Accuracy', 'Root Mean Squared Error', 'best run date', 'best method']]
 
-include_in_html_report(type="dataframe", section_header=f"Comparison with version {VERSION} performances", section_content=version_models_summary, prefix=prefix_dir_results_root, key=key)
+include_in_html_report(type="dataframe", section_header=f"Comparison with version {VERSION} performances", section_content=version_models_summary, prefix=prefix_dir_results_root,
+                       key=key)
 include_in_html_report(type="dataframe", section_header="Comparison with all model performances", section_content=all_models_summary, prefix=prefix_dir_results_root, key=key)
 include_in_html_report("header", section_content=f"Appendix", section_figure=2, prefix=prefix_dir_results_root, key=key)
 include_in_html_report(type="dataframe", section_header="Data Sample", section_content=df.head(5), prefix=prefix_dir_results_root, key=key)
-#include_in_html_report(type="text", section_header="FIX THIS!!", section_content="FIX THIS!", prefix_dir_results_root=prefix_dir_results_root, key=key)
+# include_in_html_report(type="text", section_header="FIX THIS!!", section_content="FIX THIS!", prefix_dir_results_root=prefix_dir_results_root, key=key)
 include_in_html_report(type="dict", section_header="Environment Variables", section_content=env_vars, prefix=prefix_dir_results_root, key=key)
 include_in_html_report(type="text", section_header="Useful info",
                        section_content_list=[f"Tensorflow version: {tf.__version__}"
