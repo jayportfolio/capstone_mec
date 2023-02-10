@@ -1,0 +1,34 @@
+{
+	"n_jobs": 6,
+    
+            "xgb1__tree_method": ["auto"], 
+                "xgb1__subsample": [0.5, 0.75, 0.9],
+            "xgb1__n_estimators": [50,100],
+            "xgb1__min_samples_leaf": [20,50],
+            "xgb1__max_samples":[1, 0.75, 0.9],
+            "xgb1__max_leaf_nodes": [2,20,100],
+            "xgb1__max_features": [null,16,64,132],
+            "xgb1__max_depth": [10,20],
+            "xgb1__learning_rate": [0.01, 0.1, 1],
+            "xgb1__lambda": [null, 0.5, 1, 10],
+            "xgb1__colsample_bytree":[1,0.75, 0.9],
+                "xgb1__booster": ["dart"],
+
+	"lgb1__num_leaves": [10,20,50],
+	"lgb1__num_iterations": [25,50,100,200],
+	"lgb1__n_estimators": [64, 132,264],
+	"lgb1__min_child_samples": [10,20,40],
+	"lgb1__metric": "auc",
+	"lgb1__learning_rate": [0.05, 0.5],
+	"lgb1__is_unbalance": [true,false],
+	"lgb1__colsample_bytree": 0.6,
+        	"lgb1__boosting_type": ["gbdt","dart"],
+
+	"knn1__weights": ["distance"],
+	"knn1__p": [1, 2],
+	"knn1__n_neighbors": [7, 9,11],
+	"knn1__metric": ["minkowski"],
+	"knn1__leaf_size": [3, 30, 60,90,180]
+
+	
+}

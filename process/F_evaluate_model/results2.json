@@ -1,0 +1,45 @@
+{
+    "light gradient boosting (v11)": {
+        "Mean Absolute Error Accuracy": 43935.71997083284,
+        "Mean Squared Error Accuracy": 3245388495.1882553,
+        "R square Accuracy": 0.7127060941481071,
+        "Root Mean Squared Error": 56968.31132470275,
+        "_method": "random search",
+        "_params": {
+            "model__boosting_type": "dart",
+            "model__colsample_bytree": 0.6,
+            "model__is_unbalance": false,
+            "model__learning_rate": 0.5,
+            "model__metric": "auc",
+            "model__min_child_samples": 20,
+            "model__n_estimators": 264,
+            "model__num_iterations": 500,
+            "model__num_leaves": 20,
+            "model__verbose": 1
+        },
+        "_score": 0.7127060941481071,
+        "_train time": 878.9773333072662,
+        "best is shared": false,
+        "best method": "random search",
+        "best params": {
+            "model__boosting_type": "dart",
+            "model__colsample_bytree": 0.6,
+            "model__is_unbalance": false,
+            "model__learning_rate": 0.5,
+            "model__metric": "auc",
+            "model__min_child_samples": 20,
+            "model__n_estimators": 264,
+            "model__num_iterations": 500,
+            "model__num_leaves": 20,
+            "model__verbose": 1
+        },
+        "best run date": "2023-02-07 21:56:57.820129",
+        "best score": 0.7127060941481071,
+        "best time": 878.9773333072662,
+        "date": "2023-02-07 21:56:57.820129",
+        "first run": "2023-02-07 21:56:57.820295",
+        "random_state": 101,
+        "run_env": "gradient",
+        "suboptimal": "pending"
+    }
+}

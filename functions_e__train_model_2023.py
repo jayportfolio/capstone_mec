@@ -81,9 +81,18 @@ def get_chosen_model(key):
             raise ValueError(f'no model found for key: {key}')
 
 
-def get_hyperparameters(key, use_gpu, prefix='./'):
+def get_hyperparameters(key, use_gpu, prefix='./', version=None):
+    #hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    #hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    #hp_file = f'process/z_envs/hyperparameters/{key.lower()}.json'
+    
+    if version:
+        hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()} v{version}.json'
+    else:
+        hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    
     if key.lower() == "XG Boost".lower():
-        with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
+        with open(hp_file) as f:
             hyperparameters = json.loads(f.read())
 
         if use_gpu:
@@ -97,13 +106,13 @@ def get_hyperparameters(key, use_gpu, prefix='./'):
     elif key.lower() in ['catboost', 'random forest', "Linear Regression (Ridge)".lower(), "Light Gradient Boosting".lower(),
                          'knn', 'decision tree', 'xg boost (tree)', 'xg boost (linear)']:
 
-        with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
+        with open(hp_file) as f:
             hyperparameters = json.loads(f.read())
 
     else:
         try:
             print("failed all other avenues, just trying to find the hyperparams with pattern-matching")
-            with open(prefix + f'process/z_envs/hyperparameters/{key.lower()}.json') as f:
+            with open(prefix + hp_file) as f:
                 hyperparameters = json.loads(f.read())
 
         except:

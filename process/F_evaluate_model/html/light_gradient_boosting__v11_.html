@@ -1,59 +1,25 @@
-<h1>Results from Stacked Model</h1><h3>Dataset Version: 11</h3>Date run: 2023-02-07 11:44:46.539969<br>Start time: 2023-02-07 11:16:15.672045<br>End time: 2023-02-07 11:44:46.539958<br><hr><h2>Results</h2><h3>Summary</h3>pickled new version of model
--5.400339210089291 is new best score (it's better than -999)<br><hr><h3>Tuned Models ranked by performance, with parameter details</h3><table border="1" class="dataframe">
+<h1>Results from Light Gradient Boosting</h1><h3>Dataset Version: 11</h3>Date run: 2023-02-07 21:56:59.018337<br>Start time: 2023-02-07 21:30:49.501242<br>End time: 2023-02-07 21:56:59.018328<br><hr><h2>Results</h2><h3>Summary</h3>pickled new version of model
+0.7127060941481071 is new best score (it's better than -999)<br><hr><h3>Tuned Models ranked by performance, with parameter details</h3><table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>mean_test_score</th>
       <th>mean_fit_time</th>
       <th>mean_score_time</th>
-      <th>param_model__xgb1__tree_method</th>
-      <th>param_model__xgb1__subsample</th>
-      <th>param_model__xgb1__n_estimators</th>
-      <th>param_model__xgb1__min_samples_leaf</th>
-      <th>param_model__xgb1__max_samples</th>
-      <th>param_model__xgb1__max_leaf_nodes</th>
-      <th>param_model__xgb1__max_features</th>
-      <th>param_model__xgb1__max_depth</th>
-      <th>param_model__xgb1__learning_rate</th>
-      <th>param_model__xgb1__lambda</th>
-      <th>param_model__xgb1__colsample_bytree</th>
-      <th>param_model__xgb1__booster</th>
-      <th>param_model__n_jobs</th>
-      <th>param_model__lgb1__num_leaves</th>
-      <th>param_model__lgb1__num_iterations</th>
-      <th>param_model__lgb1__n_estimators</th>
-      <th>param_model__lgb1__min_child_samples</th>
-      <th>param_model__lgb1__metric</th>
-      <th>param_model__lgb1__learning_rate</th>
-      <th>param_model__lgb1__is_unbalance</th>
-      <th>param_model__lgb1__colsample_bytree</th>
-      <th>param_model__lgb1__boosting_type</th>
-      <th>param_model__knn1__weights</th>
-      <th>param_model__knn1__p</th>
-      <th>param_model__knn1__n_neighbors</th>
-      <th>param_model__knn1__metric</th>
-      <th>param_model__knn1__leaf_size</th>
+      <th>param_model__verbose</th>
+      <th>param_model__num_leaves</th>
+      <th>param_model__num_iterations</th>
+      <th>param_model__n_estimators</th>
+      <th>param_model__min_child_samples</th>
+      <th>param_model__metric</th>
+      <th>param_model__learning_rate</th>
+      <th>param_model__is_unbalance</th>
+      <th>param_model__colsample_bytree</th>
+      <th>param_model__boosting_type</th>
       <th>params2</th>
     </tr>
     <tr>
       <th>rank_test_score</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -73,24 +39,29 @@
   <tbody>
     <tr>
       <th>1</th>
-      <td>0.683330</td>
-      <td>51.981448</td>
-      <td>2.019974</td>
-      <td>auto</td>
+      <td>0.701157</td>
+      <td>17.144458</td>
+      <td>0.465335</td>
+      <td>1</td>
+      <td>20</td>
+      <td>500</td>
+      <td>264</td>
+      <td>20</td>
+      <td>auc</td>
       <td>0.5</td>
-      <td>50</td>
-      <td>20</td>
-      <td>0.9</td>
-      <td>20</td>
-      <td>16</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>10</td>
-      <td>0.9</td>
+      <td>False</td>
+      <td>0.6</td>
       <td>dart</td>
-      <td>6</td>
+      <td>1/20/500/264/20/auc/0.5/False/0.6/dart</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.672890</td>
+      <td>27.978865</td>
+      <td>1.615559</td>
+      <td>1</td>
       <td>20</td>
-      <td>100</td>
+      <td>1000</td>
       <td>64</td>
       <td>20</td>
       <td>auc</td>
@@ -98,219 +69,348 @@
       <td>True</td>
       <td>0.6</td>
       <td>gbdt</td>
-      <td>distance</td>
-      <td>2</td>
-      <td>7</td>
-      <td>minkowski</td>
-      <td>3</td>
-      <td>auto/0.5/50/20/0.9/20/16/10/0.1/10/0.9/dart/6/20/100/64/20/auc/0.5/True/0.6/gbdt/distance/2/7/minkowski/3</td>
+      <td>1/20/1000/64/20/auc/0.5/True/0.6/gbdt</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.674364</td>
-      <td>57.889815</td>
-      <td>14.543721</td>
-      <td>auto</td>
-      <td>0.9</td>
-      <td>20</td>
-      <td>50</td>
+      <td>0.672890</td>
+      <td>42.733165</td>
+      <td>1.166149</td>
       <td>1</td>
-      <td>2</td>
-      <td>16</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>None</td>
-      <td>0.75</td>
+      <td>20</td>
+      <td>1000</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>gbdt</td>
+      <td>1/20/1000/132/20/auc/0.5/True/0.6/gbdt</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.670483</td>
+      <td>20.708723</td>
+      <td>0.243558</td>
+      <td>1</td>
+      <td>20</td>
+      <td>100</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>False</td>
+      <td>0.6</td>
       <td>dart</td>
-      <td>6</td>
+      <td>1/20/100/132/20/auc/0.5/False/0.6/dart</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.657581</td>
+      <td>0.331033</td>
+      <td>0.029561</td>
+      <td>1</td>
       <td>20</td>
       <td>50</td>
+      <td>264</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>False</td>
+      <td>0.6</td>
+      <td>gbdt</td>
+      <td>1/20/50/264/20/auc/0.5/False/0.6/gbdt</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.640975</td>
+      <td>1.566617</td>
+      <td>0.031774</td>
+      <td>1</td>
+      <td>20</td>
+      <td>25</td>
       <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>gbdt</td>
+      <td>1/20/25/132/20/auc/0.5/True/0.6/gbdt</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.640975</td>
+      <td>0.459720</td>
+      <td>0.029546</td>
+      <td>1</td>
+      <td>20</td>
+      <td>25</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>False</td>
+      <td>0.6</td>
+      <td>gbdt</td>
+      <td>1/20/25/132/20/auc/0.5/False/0.6/gbdt</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.632825</td>
+      <td>1.078228</td>
+      <td>0.065563</td>
+      <td>1</td>
+      <td>20</td>
+      <td>50</td>
+      <td>64</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/50/64/20/auc/0.5/True/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.631092</td>
+      <td>0.470125</td>
+      <td>0.055027</td>
+      <td>1</td>
+      <td>20</td>
+      <td>100</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/100/132/20/auc/0.5/True/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.627268</td>
+      <td>17.953478</td>
+      <td>1.260226</td>
+      <td>1</td>
+      <td>20</td>
+      <td>1000</td>
+      <td>264</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.005</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/1000/264/20/auc/0.005/True/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.627268</td>
+      <td>44.443933</td>
+      <td>0.947640</td>
+      <td>1</td>
+      <td>20</td>
+      <td>1000</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.005</td>
+      <td>False</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/1000/132/20/auc/0.005/False/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0.570437</td>
+      <td>1.842672</td>
+      <td>0.229174</td>
+      <td>1</td>
+      <td>20</td>
+      <td>500</td>
+      <td>64</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.005</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/500/64/20/auc/0.005/True/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0.567709</td>
+      <td>3.065200</td>
+      <td>0.452771</td>
+      <td>1</td>
+      <td>20</td>
+      <td>500</td>
+      <td>264</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.005</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>gbdt</td>
+      <td>1/20/500/264/20/auc/0.005/True/0.6/gbdt</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>0.523862</td>
+      <td>33.852410</td>
+      <td>1.065445</td>
+      <td>1</td>
+      <td>20</td>
+      <td>1000</td>
+      <td>132</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.5</td>
+      <td>False</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/1000/132/20/auc/0.5/False/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>0.466897</td>
+      <td>0.944329</td>
+      <td>0.083744</td>
+      <td>1</td>
+      <td>20</td>
+      <td>25</td>
+      <td>264</td>
+      <td>20</td>
+      <td>auc</td>
+      <td>0.05</td>
+      <td>True</td>
+      <td>0.6</td>
+      <td>goss</td>
+      <td>1/20/25/264/20/auc/0.05/True/0.6/goss</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>0.306738</td>
+      <td>5.117835</td>
+      <td>0.149084</td>
+      <td>1</td>
+      <td>20</td>
+      <td>50</td>
+      <td>64</td>
       <td>20</td>
       <td>auc</td>
       <td>0.05</td>
       <td>False</td>
       <td>0.6</td>
-      <td>gbdt</td>
-      <td>distance</td>
-      <td>1</td>
-      <td>7</td>
-      <td>minkowski</td>
-      <td>3</td>
-      <td>auto/0.9/20/50/1/2/16/10/0.1/None/0.75/dart/6/20/50/132/20/auc/0.05/False/0.6/gbdt/distance/1/7/minkowski/3</td>
+      <td>dart</td>
+      <td>1/20/50/64/20/auc/0.05/False/0.6/dart</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>0.673803</td>
-      <td>18.428690</td>
-      <td>1.831990</td>
-      <td>auto</td>
-      <td>0.5</td>
-      <td>20</td>
-      <td>50</td>
-      <td>0.9</td>
-      <td>20</td>
-      <td>16</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>None</td>
-      <td>0.75</td>
-      <td>dart</td>
-      <td>6</td>
-      <td>20</td>
-      <td>50</td>
-      <td>64</td>
-      <td>20</td>
-      <td>auc</td>
-      <td>0.5</td>
-      <td>True</td>
-      <td>0.6</td>
-      <td>gbdt</td>
-      <td>distance</td>
-      <td>2</td>
-      <td>11</td>
-      <td>minkowski</td>
-      <td>60</td>
-      <td>auto/0.5/20/50/0.9/20/16/10/0.1/None/0.75/dart/6/20/50/64/20/auc/0.5/True/0.6/gbdt/distance/2/11/minkowski/60</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.573962</td>
-      <td>81.896856</td>
-      <td>14.652918</td>
-      <td>auto</td>
-      <td>0.75</td>
-      <td>50</td>
-      <td>50</td>
+      <th>17</th>
+      <td>0.280954</td>
+      <td>1.569992</td>
+      <td>0.161542</td>
       <td>1</td>
-      <td>2</td>
-      <td>16</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>1</td>
-      <td>1</td>
-      <td>dart</td>
-      <td>6</td>
-      <td>20</td>
-      <td>25</td>
-      <td>132</td>
-      <td>20</td>
-      <td>auc</td>
-      <td>0.5</td>
-      <td>True</td>
-      <td>0.6</td>
-      <td>goss</td>
-      <td>distance</td>
-      <td>1</td>
-      <td>7</td>
-      <td>minkowski</td>
-      <td>30</td>
-      <td>auto/0.75/50/50/1/2/16/10/0.1/1/1/dart/6/20/25/132/20/auc/0.5/True/0.6/goss/distance/1/7/minkowski/30</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>0.309193</td>
-      <td>22.990600</td>
-      <td>1.910315</td>
-      <td>auto</td>
-      <td>0.9</td>
-      <td>20</td>
-      <td>50</td>
-      <td>0.75</td>
-      <td>2</td>
-      <td>None</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>None</td>
-      <td>1</td>
-      <td>dart</td>
-      <td>6</td>
-      <td>20</td>
-      <td>50</td>
-      <td>64</td>
-      <td>20</td>
-      <td>auc</td>
-      <td>0.5</td>
-      <td>False</td>
-      <td>0.6</td>
-      <td>goss</td>
-      <td>distance</td>
-      <td>2</td>
-      <td>11</td>
-      <td>minkowski</td>
-      <td>90</td>
-      <td>auto/0.9/20/50/0.75/2/None/10/0.1/None/1/dart/6/20/50/64/20/auc/0.5/False/0.6/goss/distance/2/11/minkowski/90</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>0.260664</td>
-      <td>51.137741</td>
-      <td>1.975474</td>
-      <td>auto</td>
-      <td>0.75</td>
-      <td>50</td>
-      <td>20</td>
-      <td>1</td>
-      <td>2</td>
-      <td>64</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>1</td>
-      <td>0.9</td>
-      <td>dart</td>
-      <td>6</td>
-      <td>20</td>
-      <td>25</td>
-      <td>132</td>
-      <td>20</td>
-      <td>auc</td>
-      <td>0.5</td>
-      <td>True</td>
-      <td>0.6</td>
-      <td>dart</td>
-      <td>distance</td>
-      <td>2</td>
-      <td>7</td>
-      <td>minkowski</td>
-      <td>3</td>
-      <td>auto/0.75/50/20/1/2/64/10/0.1/1/0.9/dart/6/20/25/132/20/auc/0.5/True/0.6/dart/distance/2/7/minkowski/3</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>-0.095886</td>
-      <td>17.739005</td>
-      <td>1.872683</td>
-      <td>auto</td>
-      <td>0.5</td>
-      <td>20</td>
-      <td>20</td>
-      <td>0.9</td>
-      <td>20</td>
-      <td>64</td>
-      <td>10</td>
-      <td>0.1</td>
-      <td>10</td>
-      <td>0.75</td>
-      <td>dart</td>
-      <td>6</td>
       <td>20</td>
       <td>100</td>
-      <td>64</td>
+      <td>132</td>
       <td>20</td>
       <td>auc</td>
-      <td>0.5</td>
+      <td>0.005</td>
       <td>False</td>
       <td>0.6</td>
       <td>gbdt</td>
-      <td>distance</td>
-      <td>2</td>
-      <td>7</td>
-      <td>minkowski</td>
-      <td>90</td>
-      <td>auto/0.5/20/20/0.9/20/64/10/0.1/10/0.75/dart/6/20/100/64/20/auc/0.5/False/0.6/gbdt/distance/2/7/minkowski/90</td>
+      <td>1/20/100/132/20/auc/0.005/False/0.6/gbdt</td>
     </tr>
   </tbody>
-</table><hr><h3>Best and worst models obtained by tuning</h3><img src="../artifacts/stacked_model__v11__best_and_worst.png"/><hr><h3>Best Model: Comparing model predictions to actual property values</h3><img src="../artifacts/stacked_model__v11__best_model_correlation.png"/><hr><h2>Comparison with other models</h2><h3>Comparison with version 11 performances</h3><table border="1" class="dataframe">
+</table><hr><h3>Best and worst models obtained by tuning</h3><img src="../artifacts/light_gradient_boosting__v11__best_and_worst.png"/><hr><h3>Best Model: Comparing model predictions to actual property values</h3><img src="../artifacts/light_gradient_boosting__v11__best_model_correlation.png"/><hr><h2>Feature Importances</h2><h3>Feature Importances</h3>1. features 4 (1600.000000)		location.longitude
+2. features 5 (1454.000000)		latitude_deviation
+3. features 3 (1397.000000)		location.latitude
+4. features 6 (1367.000000)		longitude_deviation
+5. features 2 (860.000000)		nearestStation
+6. features 0 (480.000000)		bedrooms
+7. features 1 (238.000000)		bathrooms
+8. features 81 (191.000000)		tenure.tenureType_LEASEHOLD
+9. features 80 (190.000000)		tenure.tenureType_FREEHOLD
+10. features 57 (132.000000)		feature__2__garden
+11. features 71 (118.000000)		feature__2__balcony
+12. features 59 (116.000000)		feature__2__parking
+13. features 82 (80.000000)		tenure.tenureType_SHARE_OF_FREEHOLD
+14. features 67 (66.000000)		feature__2__garage
+15. features 14 (57.000000)		feature__chain free
+16. features 77 (52.000000)		feature__2__underfloor heating
+17. features 58 (48.000000)		feature__2__central heating
+18. features 55 (44.000000)		feature__two double bedrooms
+19. features 73 (43.000000)		feature__2__double glazing
+20. features 53 (42.000000)		feature__two bathrooms
+21. features 49 (37.000000)		feature__share of freehold
+22. features 54 (36.000000)		feature__two bedrooms
+23. features 17 (32.000000)		feature__communal gardens
+24. features 10 (31.000000)		feature__allocated parking
+25. features 16 (29.000000)		feature__communal garden
+26. features 45 (29.000000)		feature__private garden
+27. features 38 (29.000000)		feature__no chain
+28. features 50 (29.000000)		feature__three bedrooms
+29. features 32 (28.000000)		feature__ground floor
+30. features 12 (28.000000)		feature__balcony
+31. features 44 (24.000000)		feature__private balcony
+32. features 39 (24.000000)		feature__no onward chain
+33. features 48 (24.000000)		feature__separate kitchen
+34. features 68 (23.000000)		feature__2__en-suite
+35. features 22 (23.000000)		feature__epc rating d
+36. features 70 (22.000000)		feature__2__penthouse
+37. features 40 (22.000000)		feature__off street parking
+38. features 19 (20.000000)		feature__double glazed
+39. features 7 (19.000000)		feature__1 bedroom
+40. features 35 (19.000000)		feature__long lease
+41. features 30 (18.000000)		feature__gas central heating
+42. features 42 (18.000000)		feature__one double bedroom
+43. features 56 (18.000000)		feature__two reception rooms
+44. features 27 (17.000000)		feature__fitted kitchen
+45. features 13 (17.000000)		feature__bathroom
+46. features 41 (17.000000)		feature__one bedroom
+47. features 47 (16.000000)		feature__reception room
+48. features 61 (16.000000)		feature__2__shower
+49. features 76 (16.000000)		feature__2__patio
+50. features 26 (15.000000)		feature__first floor
+51. features 8 (14.000000)		feature__2 bedrooms
+52. features 11 (13.000000)		feature__allocated parking space
+53. features 25 (13.000000)		feature__family bathroom
+54. features 69 (13.000000)		feature__2__en suite
+55. features 33 (13.000000)		feature__kitchen
+56. features 29 (13.000000)		feature__garden
+57. features 34 (12.000000)		feature__leasehold
+58. features 31 (11.000000)		feature__great location
+59. features 66 (11.000000)		feature__2__dining room
+60. features 52 (11.000000)		feature__top floor
+61. features 20 (11.000000)		feature__double glazing
+62. features 46 (10.000000)		feature__private rear garden
+63. features 15 (10.000000)		feature__close to local amenities
+64. features 28 (8.000000)		feature__garage
+65. features 23 (8.000000)		feature__excellent location
+66. features 9 (7.000000)		feature__2 double bedrooms
+67. features 51 (7.000000)		feature__three double bedrooms
+68. features 21 (6.000000)		feature__epc rating c
+69. features 37 (6.000000)		feature__modern kitchen
+70. features 60 (6.000000)		feature__2__off road
+71. features 43 (6.000000)		feature__parking
+72. features 75 (5.000000)		feature__2__security
+73. features 78 (4.000000)		feature__2__marble
+74. features 18 (4.000000)		feature__double bedroom
+75. features 36 (3.000000)		feature__modern bathroom
+76. features 24 (3.000000)		feature__excellent transport links
+77. features 65 (1.000000)		feature__2__insulat
+78. features 72 (0.000000)		feature__2__double-glazing
+79. features 62 (0.000000)		feature__2__cavity wall insulation
+80. features 63 (0.000000)		feature__2__wall insulation
+81. features 64 (0.000000)		feature__2__insulation
+82. features 74 (0.000000)		feature__2__off-road parking
+83. features 79 (0.000000)		tenure.tenureType_COMMONHOLD
+<br><hr><h3>Feature Importances (Light Gradient Boosting)</h3><img src="../artifacts/light_gradient_boosting__v11__best_model_feature_importances.png"/><hr><h2>Comparison with other models</h2><h3>Comparison with version 11 performances</h3><table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -326,14 +426,14 @@
   </thead>
   <tbody>
     <tr>
-      <th>stacked model (v11)</th>
-      <td>-5.400339</td>
-      <td>46.05935</td>
-      <td>225036.146515</td>
-      <td>72300827879.148743</td>
-      <td>-5.400339</td>
-      <td>268888.132648</td>
-      <td>2023-02-07 11:44:45.685685</td>
+      <th>light gradient boosting (v11)</th>
+      <td>0.712706</td>
+      <td>878.977333</td>
+      <td>43935.719971</td>
+      <td>3245388495.188255</td>
+      <td>0.712706</td>
+      <td>56968.311325</td>
+      <td>2023-02-07 21:56:57.820129</td>
       <td>random search</td>
     </tr>
   </tbody>
@@ -353,14 +453,14 @@
   </thead>
   <tbody>
     <tr>
-      <th>stacked model (v11)</th>
-      <td>-5.400339</td>
-      <td>46.05935</td>
-      <td>225036.146515</td>
-      <td>72300827879.148743</td>
-      <td>-5.400339</td>
-      <td>268888.132648</td>
-      <td>2023-02-07 11:44:45.685685</td>
+      <th>light gradient boosting (v11)</th>
+      <td>0.712706</td>
+      <td>878.977333</td>
+      <td>43935.719971</td>
+      <td>3245388495.188255</td>
+      <td>0.712706</td>
+      <td>56968.311325</td>
+      <td>2023-02-07 21:56:57.820129</td>
       <td>random search</td>
     </tr>
   </tbody>
@@ -957,6 +1057,6 @@
       <td>0</td>
     </tr>
   </tbody>
-</table><hr><h3>Hyperparameter options for Randomized Grid Search</h3>{'model__n_jobs': [6], 'model__xgb1__subsample': [0.5, 0.75, 0.9], 'model__xgb1__n_estimators': [20, 50], 'model__xgb1__min_samples_leaf': [20, 50], 'model__xgb1__max_depth': [10], 'model__xgb1__learning_rate': [0.1], 'model__xgb1__booster': ['dart'], 'model__xgb1__lambda': [None, 1, 10, 50], 'model__xgb1__tree_method': ['auto'], 'model__xgb1__colsample_bytree': [1, 0.75, 0.9], 'model__xgb1__max_leaf_nodes': [2, 20], 'model__xgb1__max_samples': [1, 0.75, 0.9], 'model__xgb1__max_features': [None, 16, 64], 'model__knn1__leaf_size': [3, 30, 60, 90], 'model__knn1__metric': ['minkowski'], 'model__knn1__n_neighbors': [7, 9, 11], 'model__knn1__p': [1, 2], 'model__knn1__weights': ['distance'], 'model__lgb1__boosting_type': ['gbdt', 'rf', 'dart', 'goss'], 'model__lgb1__colsample_bytree': [0.6], 'model__lgb1__is_unbalance': [True, False], 'model__lgb1__learning_rate': [0.05, 0.5], 'model__lgb1__metric': ['auc'], 'model__lgb1__min_child_samples': [20], 'model__lgb1__n_estimators': [64, 132], 'model__lgb1__num_iterations': [25, 50, 100], 'model__lgb1__num_leaves': [20]}
-<hr><h3>Range of hyperparameter results</h3><img src="../artifacts/stacked_model__v11__evolution_of_models_fig.png"/><hr><h3>Environment Variables</h3>{'notebook_environment': 'gradient', 'use_gpu': True, 'debug_mode': False, 'quick_mode': False, 'quick_override_cv_splits': 2, 'quick_override_n_iter': 10, 'quick_override_n_jobs': 3}
+</table><hr><h3>Hyperparameter options for Randomized Grid Search</h3>{'model__boosting_type': ['gbdt', 'rf', 'dart', 'goss'], 'model__colsample_bytree': [0.6], 'model__is_unbalance': [True, False], 'model__learning_rate': [0.0005, 0.005, 0.05, 0.5, 5], 'model__metric': ['auc'], 'model__min_child_samples': [20], 'model__n_estimators': [64, 132, 264], 'model__num_iterations': [25, 50, 100, 500, 1000], 'model__num_leaves': [20], 'model__verbose': [1]}
+<hr><h3>Range of hyperparameter results</h3><img src="../artifacts/light_gradient_boosting__v11__evolution_of_models_fig.png"/><hr><h3>Environment Variables</h3>{'notebook_environment': 'gradient', 'use_gpu': True, 'debug_mode': False, 'quick_mode': False, 'quick_override_cv_splits': 2, 'quick_override_n_iter': 10, 'quick_override_n_jobs': 3}
 <hr>

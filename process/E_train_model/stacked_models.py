@@ -16,7 +16,7 @@
 import sys
 import os
 
-FILENAME = 'all_models_except_neural_networks'
+FILENAME = 'stacked models'
 
 #ALGORITHM = 'Linear Regression (Ridge)'
 ALGORITHM = 'Stacked Model'
@@ -33,8 +33,9 @@ ALGORITHM_DETAIL = 'random search'
 #DATA_DETAIL = ['no scale','no dummies']
 #DATA_DETAIL = ['explore param']
 DATA_DETAIL = ['no dummies'] if 'catboost' in ALGORITHM.lower() else []
-VERSION = '06'
-#VERSION = '11'
+#VERSION = '06'
+#VERSION = '09'
+VERSION = '11'
 
 RANDOM_STATE = 101
 TRAINING_SIZE = 0.9
@@ -297,7 +298,7 @@ starter_model = starter_pipe[-1]
 
 # In[14]:
 
-options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters)
+options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION)
 
 if 'explore param' in DATA_DETAIL:
     def automl_step(param_options, vary):
@@ -317,7 +318,8 @@ if 'explore param' in DATA_DETAIL:
     
     ALGORITHM_DETAIL = 'grid search (implied)'
 
-OVERRIDE_N_ITER = 15
+#OVERRIDE_N_ITER = 15
+OVERRIDE_N_ITER = 50
 
 param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block, debug_mode=debug_mode,
                                                                   override_cv=OVERRIDE_CV,
@@ -547,7 +549,7 @@ if not using_catboost:
         debug_cols = ['rank_test_score', 'mean_test_score', 'mean_fit_time', 'mean_score_time']
         debug_cols.extend([c for c in cv_results_df.columns if 'param' in c and c != 'params'])
 
-    cv_results_df_summary = cv_results_df[debug_cols].head(7)
+    cv_results_df_summary = cv_results_df[debug_cols].head(17)
     cv_results_df_summary.set_index('rank_test_score', inplace=True)
 
     if is_jupyter:display(cv_results_df_summary)
