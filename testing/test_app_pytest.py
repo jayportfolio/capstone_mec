@@ -6,8 +6,9 @@ import numpy as np
 import pytest
 from sklearn.pipeline import Pipeline
 
-import functions_d3__prepare_store_data_2023
-from functions_gh_presentation_and_launch import load_model
+import utility_functions.functions_d3__prepare_store_data
+from utility_functions.functions_gh_presentation_and_launch import load_model
+from utility_functions.functions_d3__prepare_store_data import this_test_data
 
 debug_mode = False
 
@@ -31,7 +32,8 @@ testdata_neural_network = [
     #    ("models_pretrained", "neural network m15 mega + dropout (v11)_v11", '11', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m12 mega_v06", '06', keras.models.Sequential),
     # ("models", "optimised_model_Neural Network m15 mega + dropout_v09", '09', keras.models.Sequential)
-    ("models_pretrained", "optimised_neural network m15 mega + dropout (v09)_v09", '09', keras.models.Sequential)
+    # ?? ("models_pretrained", "optimised_neural network m15 mega + dropout (v09)_v09", '09', keras.models.Sequential)
+    ("models_pretrained", "optimised_neural network m16 mega + dropout (v11)_v11", '11', keras.models.Sequential)
 ]
 
 
@@ -49,7 +51,7 @@ def test_load_standard_model(directory, selected_model, version, expected_type):
 def test_predict_using_standard_model(directory, selected_model, version, expected_type):
     model = test_load_standard_model(directory, selected_model, version, expected_type)
 
-    X_test, y_test, feature_names = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+    X_test, y_test, feature_names = this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
 
     y_pred = model.predict(X_test)
     assert type(y_pred) == type(y_test)
@@ -80,9 +82,9 @@ def test_load_neural_network(directory, selected_model, version, expected_type):
 def test_predict_using_neural_network(directory, selected_model, version, expected_type):
     model = test_load_neural_network(directory, selected_model, version, expected_type)
 
-    X_test, y_test, feature_names = functions_d3__prepare_store_data_2023.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+    X_test, y_test, feature_names = utility_functions.functions_d3__prepare_store_data.this_test_data(VERSION=version, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
 
-    debug_mode = True
+    debug_mode = False
     if debug_mode:
         y_test = [y_test[0]]
         X_test = [[2.0000,

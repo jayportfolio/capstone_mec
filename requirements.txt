@@ -21,6 +21,12 @@ pytest
 matplotlib
 lightgbm
 
+# Included since adding data collection components
+Scrapy #==2.6.1
+scrapy-splash #==0.8.0
+html2text
+
+
 # Temporarily remove for heroku slug
 #jupyter #==1.0.0
 #matplotlib #==3.5.2

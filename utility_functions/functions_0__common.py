@@ -4,7 +4,7 @@ def test_module():
     if True:
         pass
     elif False:
-        trial_df = pd.read_csv('data/final/df_listings_v09.csv')
+        trial_df = pd.read_csv('../data/final/df_listings_v09.csv')
         feature_engineer(trial_df, version=3)
     else:
         trial_df = pd.read_csv('data/source/df_listings_v09.csv')

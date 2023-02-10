@@ -311,7 +311,7 @@ def test_module():
     if False:
         pass
     elif False:
-        trial_df = pd.read_csv('data/final/df_listings_v09.csv')
+        trial_df = pd.read_csv('../data/final/df_listings_v09.csv')
         feature_engineer(trial_df, version=3)
     elif True:
         using_test_framework = True

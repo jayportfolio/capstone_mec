@@ -3,8 +3,8 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split
 
-from functions_0__common_20221116 import get_columns
-from functions_b__get_the_data_2023 import get_source_dataframe
+from utility_functions.functions_0__common import get_columns
+from utility_functions.functions_b__get_the_data import get_source_dataframe
 
 def create_train_test_data(df_orig, categories, RANDOM_STATE=[], p_train_size=0.9, return_index=False, drop_nulls=True, no_dummies=False):
     df = df_orig.copy()

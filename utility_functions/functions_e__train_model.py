@@ -11,9 +11,6 @@ from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegresso
 from time import time
 import json
 
-from functions_d3__prepare_store_data_2023 import this_test_data
-
-
 def make_modelling_pipeline(model, DATA_DETAIL):
     if 'no scale' in DATA_DETAIL:
         pipe = Pipeline([

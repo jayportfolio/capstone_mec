@@ -90,17 +90,17 @@ N.B. CatBoost also performs well, and will require further investigation to see 
 
 ### Python files for common functionality
 
-[Code related to assembling data](../../functions_b__get_the_data_2023.py)
+[Code related to assembling data](../../utility_functions/functions_b__get_the_data.py)
 
-[Code related to preparing and cleansing data](../../functions_d1__prepare_cleanse_data_20221116.py)
+[Code related to preparing and cleansing data](../../utility_functions/functions_d1__prepare_cleanse_data.py)
 
-[Code related to transforming and enriching data](../../functions_d2__transform_enrich_data_20221116.py)
+[Code related to transforming and enriching data](../../utility_functions/functions_d2__transform_enrich_data.py)
 
-[Code related to preparing and storing data](../../functions_d3__prepare_store_data_2023.py)
+[Code related to preparing and storing data](../../utility_functions/functions_d3__prepare_store_data.py)
 
-[Code related to training models](../../functions_d3__prepare_store_data_2023.py)
+[Code related to training models](../../utility_functions/functions_d3__prepare_store_data.py)
 
-[Code related to evaluating results](../../functions_f_evaluate_model_20221116.py)
+[Code related to evaluating results](../../utility_functions/functions_f_evaluate_model.py)
 
-[General code](../../functions_0__common_20221116.py)
+[General code](../../utility_functions/functions_0__common.py)
 

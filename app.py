@@ -10,13 +10,13 @@ import os
 from sklearn.metrics import PredictionErrorDisplay
 from sklearn.model_selection import cross_validate, cross_val_predict
 
-from functions_b__get_the_data_2023 import get_source_dataframe
-from functions_d3__prepare_store_data_2023 import this_test_data
-from functions_gh_presentation_and_launch import load_model
+from utility_functions.functions_b__get_the_data import get_source_dataframe
+from utility_functions.functions_d3__prepare_store_data import this_test_data
+from utility_functions.functions_gh_presentation_and_launch import load_model
 
-RAND_INDEX_CSV = "rand_index.csv"
+RAND_INDEX_CSV = "webapp_deployment/cache/rand_index.csv"
 #RANDOM_INSTANCE_CSV = "random_instance.csv"
-RANDOM_INSTANCE_PLUS_CSV = "random_instance_plus.csv"
+RANDOM_INSTANCE_PLUS_CSV = "webapp_deployment/cache/random_instance_plus.csv"
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -28,9 +28,9 @@ previous_data_version = DATA_VERSION
 
 prediction_models = {
     'XG Boost (data version 11) - Best model': 'optimised_model_XG Boost (tree)_v11',
-    'Stacked Model (data version 6) - Great model': 'optimised_model_Stacked Model_v06',
-    'XG Boost (data version 10) - Good model': 'optimised_model_XG Boost (tree)_v10',
+    'Stacked Model [xgb,lgb,knn] (data version 6) - Great model': 'optimised_model_Stacked Model_v06',
     'KNN (data version 6) - Fastest to train, Good model': 'optimised_model_KNN_v06',
+    'XG Boost (data version 10) - Good model': 'optimised_model_XG Boost (tree)_v10',
     'Catboost (data version 6) - Good model': 'optimised_model_CatBoost_v06',
     'Light Gradient Boosting (data version 6) - Good model': 'optimised_model_Light Gradient Boosting_v06',
     'Stacked Model - still in beta (data version 11)': 'optimised_model_Stacked Model_v11',
@@ -144,11 +144,27 @@ def main():
         # print("inputs:", len(inputs))
         # print("inputs:", len(inputs[0]))
 
-        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
         model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
+        X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
+
+        print("length of test instance(1): ", len(X_test[0]))
+        random_instance = [X_test[rand_index]]
+        print("length of test instance(2): ", len(X_test[0]))
+        print("length of test instance(3): ", len([X_test[rand_index]]))
+        print("test instance(3): ", [X_test[rand_index]])
+        print("length of test instance(4): ", len(random_instance))
 
         fake_X = [[0]*len(X_test[0]),]
         #result = model.predict(fake_X)
+        print("length of test instance(5): ", len(fake_X))
+
+        print(fake_X)
+        print(len(fake_X), len(fake_X[0]), type(fake_X), type(fake_X[0]))
+        print(random_instance)
+        print(len(random_instance), len(random_instance[0]), type(random_instance), type(random_instance[0]))
+        random_instance = [random_instance[0].tolist()]
+        print(random_instance)
+        print(len(random_instance), len(random_instance[0]), type(random_instance), type(random_instance[0]))
 
         #result = model.predict(X_test)
         result = model.predict(random_instance)
@@ -164,7 +180,10 @@ def main():
         if 'eural' in selected_model_key:
             from sklearn.metrics import r2_score
             st.write('Score:', r2_score(y_test, y_pred))
-            st.write('Accuracy of test set: ', acc)
+            try:
+                st.write('Accuracy of test set: ', acc)
+            except:
+                pass
 
         ax.scatter(y_test, y_pred, s=25, c='blue')
         ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, c='black')

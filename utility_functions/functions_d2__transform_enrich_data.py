@@ -1,11 +1,4 @@
-import ast
-
-import numpy as np
 import pandas as pd
-import pandas as pd
-
-import math
-
 
 def preprocess(df, version: int) -> pd.DataFrame:
     version_number = int(version)
