@@ -54,6 +54,7 @@ prefix_dir_results = './process/F_evaluate_model/'
 prefix_dir_optimised_models = './models/'
 prefix_functions_root = os.path.join('.')
 prefix_dir_results_root = './process/F_evaluate_model'
+prefix_dir_results_root2 = './process/F_evaluate_model/'
 
 
 
@@ -409,7 +410,7 @@ if not using_catboost:
         )
 
     elif ALGORITHM_DETAIL == 'rerun best':
-        results_for_best_results = get_results()
+        results_for_best_results = get_results(directory=prefix_dir_results_root2)
         model_for_best_results = results_for_best_results[key]
         
         params_for_best_results = model_for_best_results['best params']
@@ -806,7 +807,7 @@ new_results = {
 }
 
 if run_env not in ['colab']:
-    old_results_json = get_results()
+    old_results_json = get_results(directory=prefix_dir_results_root2)
     try:
         old_best_score = old_results_json[key]['best score']
     except:
