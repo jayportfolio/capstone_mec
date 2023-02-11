@@ -86,6 +86,9 @@ You can compare the respective results from the various models trained in this f
 ##### More information about my work scaling the model with additional features:<br>[09_00_scaling_my_ml_and_dl_prototypes.md](capstone_steps%2Fstep_09%2F09_00_scaling_my_ml_and_dl_prototypes.md)
 
 ### Running the WebApp
+
+* Promote a trained model into the webapp models: <br>`python process/G_present_solution/promote_good_models.py`<br><br>
+
 #### Running the WebApp Remotely
 
 You can access the running demo of the webapp at:<br>

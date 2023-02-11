@@ -12,8 +12,8 @@ del you wish to train: <br>
 #### Train a standard model, using PCA dimension reduction: <br>
 `python process/E_train_model/all_models_except_neural_networks_with_pca.py`
 
-#### Train stacked models: <br>
-`python process/E_train_model/stacked_models.py`
+#### Promote a trained model into the webapp: <br>
+`python process/G_present_solution/promote_good_models.py`
 
 
 ---
