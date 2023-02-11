@@ -34,6 +34,7 @@ algorithm_choices = [
     'XG Boost (tree)',
     'CatBoost',
     'Light Gradient Boosting',
+    'Stacked Model'
 ]
 
 print("\n\n")
@@ -205,24 +206,7 @@ from utility_functions.functions_f_evaluate_model import get_best_estimator_aver
 
 print(env_vars)
 
-
-# In[3]:
-
-
-if is_jupyter:
-    get_ipython().run_line_magic('pip', 'install tabulate')
-
-    if ALGORITHM == 'CatBoost':
-        get_ipython().run_line_magic('pip', 'install catboost')
-
-    if ALGORITHM == 'Light Gradient Boosting':
-        get_ipython().run_line_magic('pip', 'install lightgbm')
-
-
 # #### Include any overrides specific to the algorthm / python environment being used
-
-# In[4]:
-
 
 running_locally = run_env == 'local'
 
@@ -238,6 +222,9 @@ if running_locally:
         OVERRIDE_N_ITER = 3
     elif 'linear regression' in ALGORITHM.lower():
         OVERRIDE_N_ITER = 4 # 15
+    elif 'stacked model' in ALGORITHM.lower():
+        OVERRIDE_N_ITER = 1
+        OVERRIDE_CV = 2
     else:
         OVERRIDE_N_ITER = 5
 
@@ -253,9 +240,6 @@ if 'forest' in ALGORITHM.lower() or True:
 # ## Stage: defining the model pipeline
 # 
 # 
-
-# In[5]:
-
 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -277,15 +261,8 @@ starter_pipe
 # 
 # ## Stage: get the data
 
-# In[6]:
-
-
 columns, booleans, floats, categories, custom, wildcard = get_columns(version=VERSION)
 LABEL = 'Price'
-
-
-# In[7]:
-
 
 #df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='../../../', row_limit=None)
 df, retrieval_type = get_source_dataframe(cloud_run, VERSION, folder_prefix='./', row_limit=None)
@@ -298,30 +275,14 @@ if retrieval_type != 'tidy':
 
     df = df[columns]
 
-
-# In[8]:
-
-
 print(colored(f"features", "blue"), "-> ", columns)
 columns.insert(0, LABEL)
 print(colored(f"label", "green", None, ['bold']), "-> ", LABEL)
 
-
-# In[9]:
-
-
 df = preprocess(df, version=VERSION)
 df = df.dropna()
 
-
-# In[10]:
-
-
 df.head(5)
-
-
-# In[11]:
-
 
 X_train, X_test, y_train, y_test, X_train_index, X_test_index, y_train_index, y_test_index, df_features, df_labels = create_train_test_data(
     df,
@@ -341,17 +302,9 @@ print(df.shape)
 print(X_train.shape, X_test.shape, y_train.shape, y_test.shape, X_train_index.shape, X_test_index.shape,
       y_train_index.shape, y_test_index.shape)
 
-
-
-# In[12]:
-
-
 #imputer = SimpleImputer(strategy='mean')
 #imputer.fit(X_train[6])
 #X_train[6] = imputer.transform(X_train[6])
-
-
-# In[13]:
 
 
 starter_model = starter_pipe[-1]
@@ -364,10 +317,7 @@ starter_model = starter_pipe[-1]
 # * #### train the model
 # 
 # 
-
-# In[14]:
-
-options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters)
+options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION)
 
 if 'explore param' in DATA_DETAIL:
     def automl_step(param_options, vary):
@@ -386,6 +336,8 @@ if 'explore param' in DATA_DETAIL:
     options_block = automl_step(options_block, explore_param)
     
     ALGORITHM_DETAIL = 'grid search (implied)'
+
+# OVERRIDE_N_ITER = 15
 
 param_options, cv, n_jobs, refit, n_iter, verbose = get_cv_params(options_block, debug_mode=debug_mode,
                                                                   override_cv=OVERRIDE_CV,
@@ -587,7 +539,6 @@ if not using_catboost:
         total_fits = len(cv_results_df_sorted)
 
 if not using_catboost:
-    if is_jupyter:display(cv_results_df_sorted)
 
     orig_debug_mode, orig_display_df_cols = debug_mode, pd.get_option('display.max_columns')
     debug_mode = True
@@ -596,12 +547,8 @@ if not using_catboost:
         debug_cols = ['rank_test_score', 'mean_test_score', 'mean_fit_time', 'mean_score_time']
         debug_cols.extend([c for c in cv_results_df.columns if 'param' in c and c != 'params'])
 
-    cv_results_df_summary = cv_results_df[debug_cols].head(7)
+    cv_results_df_summary = cv_results_df[debug_cols].head(17)
     cv_results_df_summary.set_index('rank_test_score', inplace=True)
-
-    if is_jupyter:display(cv_results_df_summary)
-
-
 
 # 
 # #### Mini Stage: Make predictions
@@ -672,14 +619,30 @@ if not using_catboost:
 
     showable_increment = total_fits // (4 if not quick_mode else 2)
     if showable_increment==0:showable_increment=1
-    for i in range(0, total_fits, showable_increment):
+    evolution_of_models_range = list(range(0, total_fits, showable_increment))
+    evolution_of_models_range.append(-1)
+
+    for i in evolution_of_models_range:
         if debug_mode: print(f'{i} ==> {i}')
+        if i+1==len(cv_results_df_sorted):
+            pass # don't do the worst twice
 
         if i == 0:
             fitted_graph_model = crossval_runner.best_estimator_
             y_pred_graph = y_pred
         else:
-            graph_pipe_params = cv_results_df_sorted['params'][i]
+            index = i if i >=0 else total_fits - 1
+
+            try:
+                # graph_pipe_params = cv_results_df_sorted['params'][total_fits - 1]
+                graph_pipe_params = cv_results_df_sorted['params'][index]
+            except:
+                if i==-1:
+                    print("MAJOR ERROR? couldn't get cv_results_df_sorted, using whatever the best cv_results_df_full_sorted was instead")
+                    graph_pipe_params = cv_results_df_full_sorted['params'][0]
+                else:
+                    raise IndexError('could not complete graph for index ' + str(i))
+
             print(graph_pipe_params)
             # would always return the best! graph_pipe_params = cv_results_df_sorted.loc[cv_results_df_sorted['rank_test_score'] == 1, 'params'].values[0]
 
@@ -694,17 +657,22 @@ if not using_catboost:
         best_model_predictions[i] = y_pred_graph
         best_model_scores[i] = fitted_graph_model.score(X_test, y_test)
 
-    if debug_mode: print(f'{-1} ==> {-1}')
-    graph_pipe_params = cv_results_df_sorted['params'][total_fits - 1]
-    print(graph_pipe_params)
-    graph_params = {}
-    for key2, value in graph_pipe_params.items():
-        graph_params[key2.replace('model__', '')] = value
-    fitted_graph_model, y_pred_graph = custom_model_and_predictions(make_pipeline(), graph_pipe_params, X_train,
-                                                                    y_train, X_test)
-    best_models[-1] = fitted_graph_model[-1].get_params()
-    best_model_predictions[-1] = y_pred_graph
-    best_model_scores[-1] = fitted_graph_model.score(X_test, y_test)
+    # # if debug_mode: print(f'{-1} ==> {-1}')
+    # # try:
+    # #     graph_pipe_params = cv_results_df_sorted['params'][total_fits - 1]
+    # # except:
+    # #     print("MAJOR ERROR? couldn't get cv_results_df_sorted, using cv_results_df_full_sorted instead")
+    # #     graph_pipe_params = cv_results_df_full_sorted['params'][0]
+    #
+    # print(graph_pipe_params)
+    # graph_params = {}
+    # for key2, value in graph_pipe_params.items():
+    #     graph_params[key2.replace('model__', '')] = value
+    # fitted_graph_model, y_pred_graph = custom_model_and_predictions(make_pipeline(), graph_pipe_params, X_train,
+    #                                                                 y_train, X_test)
+    # best_models[-1] = fitted_graph_model[-1].get_params()
+    # best_model_predictions[-1] = y_pred_graph
+    # best_model_scores[-1] = fitted_graph_model.score(X_test, y_test)
 
 
 if not using_catboost:
@@ -1093,11 +1061,6 @@ def print_and_report(text_single, title):
 
 
 print('Nearly finished...')
-
-
-if create_python_script and is_jupyter:
-    filename = FILENAME+'.ipynb'
-    get_ipython().system('jupyter nbconvert --to script $filename')
 
 print(f'ALGORITHM: {ALGORITHM}')
 print(f'ALGORITHM_DETAIL: {ALGORITHM_DETAIL}')
