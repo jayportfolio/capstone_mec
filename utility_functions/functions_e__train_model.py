@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor, HistGradientBoostingRegresso
 from time import time
 import json
 
+
 def make_modelling_pipeline(model, DATA_DETAIL):
     if 'no scale' in DATA_DETAIL:
         pipe = Pipeline([
@@ -77,16 +78,17 @@ def get_chosen_model(key):
             raise ValueError(f'no model found for key: {key}')
 
 
-def get_hyperparameters(key, use_gpu, prefix='./', version=None):
-    #hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
-    #hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
-    #hp_file = f'process/z_envs/hyperparameters/{key.lower()}.json'
-    
-    if version:
-        hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()} v{version}.json'
-    else:
-        hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
-    
+def get_hyperparameters(key, use_gpu, prefix='./', version=None, api_version=None):
+    # hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    # hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    # hp_file = f'process/z_envs/hyperparameters/{key.lower()}.json'
+
+    warnings = []
+
+    versioned_hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()} v{version}.json'
+    unversioned_hp_file = prefix + f'process/z_envs/hyperparameters/{key.lower()}.json'
+    hp_file = versioned_hp_file if version else unversioned_hp_file
+
     if key.lower() == "XG Boost".lower():
         with open(hp_file) as f:
             hyperparameters = json.loads(f.read())
@@ -102,8 +104,17 @@ def get_hyperparameters(key, use_gpu, prefix='./', version=None):
     elif key.lower() in ['catboost', 'random forest', "Linear Regression (Ridge)".lower(), "Light Gradient Boosting".lower(),
                          'knn', 'decision tree', 'xg boost (tree)', 'xg boost (linear)']:
 
-        with open(hp_file) as f:
-            hyperparameters = json.loads(f.read())
+        try:
+            with open(hp_file) as f:
+                hyperparameters = json.loads(f.read())
+        except FileNotFoundError as e:
+            if version:
+                warnings.append("Had to look for a generic hyperparameter file even though a versioned hyperparameter file was requested.")
+                with open(unversioned_hp_file) as f:
+                    hyperparameters = json.loads(f.read())
+            else:
+                raise e
+
 
     else:
         try:
@@ -114,7 +125,10 @@ def get_hyperparameters(key, use_gpu, prefix='./', version=None):
         except:
             raise ValueError("couldn't find hyperparameters for:", key)
 
-    return hyperparameters
+    if api_version is None:
+        return hyperparameters
+    else:
+        return hyperparameters, None if len(warnings) == 0 else warnings
 
 
 def get_cv_params(options_block, debug_mode=True, override_cv=None, override_niter=None, override_verbose=None, override_njobs=None):

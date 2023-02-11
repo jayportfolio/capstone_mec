@@ -293,7 +293,7 @@ def main():
     # * #### train the model
     #
     #
-    options_block = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION)
+    options_block, warnings = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION, api_version=2)
 
     if 'explore param' in DATA_DETAIL:
         def automl_step(param_options, vary):
@@ -906,7 +906,10 @@ def main():
     print(f'DATA_DETAIL: {DATA_DETAIL}')
     print(f'FILENAME: {FILENAME}')
 
-    print('Finished!')
+    if warnings:
+        print("Warnings:\n - ", "\n - ".join(warnings))
+
+    print('\nFinished!')
 
 
 if __name__ == '__main__':
