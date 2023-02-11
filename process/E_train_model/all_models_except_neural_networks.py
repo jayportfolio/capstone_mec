@@ -26,14 +26,84 @@ ALGORITHM = 'Linear Regression (Ridge)'
 #ALGORITHM = 'CatBoost'
 #ALGORITHM = 'Light Gradient Boosting'
 
+algorithm_choices = [
+    'Linear Regression (Ridge)',
+    'KNN',
+    'Decision Tree',
+    'Random Forest',
+    'XG Boost (tree)',
+    'CatBoost',
+    'Light Gradient Boosting',
+]
+
+print("\n\n")
+for i, each in zip(range(len(algorithm_choices)), algorithm_choices):
+    print(f"{i+1}: {each}")
+    
+output = input("\nWhich algorithm do you want to use to train the model?  ")
+7
+try:
+    chosen = int(output) - 1
+    if chosen < 0 or chosen > len(algorithm_choices) - 1:raise ValueError()
+    ALGORITHM = algorithm_choices[chosen]
+except ValueError:
+    ALGORITHM = algorithm_choices[0]
+    print(f"\nNo valid choice made, using default[{ALGORITHM}]\n")
+    
+    
 ALGORITHM_DETAIL = 'random search'
 #ALGORITHM_DETAIL = 'rerun best'
 #ALGORITHM_DETAIL = 'custom'
+
+algorithm_detail_choices = [
+    'random search',
+    'rerun best',
+    'custom'
+]
+
+#print("\n\n")
+for i, each in zip(range(len(algorithm_detail_choices)), algorithm_detail_choices):
+    print(f"{i+1}: {each}")
+    
+output = input("Which algorithm search method do you want?  ")
+
+try:
+    chosen = int(output) - 1
+    if chosen < 0 or chosen > len(algorithm_detail_choices) - 1:raise ValueError()
+    ALGORITHM_DETAIL = algorithm_detail_choices[chosen]
+except ValueError:
+    ALGORITHM_DETAIL = algorithm_detail_choices[0]
+    print(f"\nNo valid choice made, using default[{ALGORITHM_DETAIL}]\n")
+
+
 #DATA_DETAIL = ['no scale','no dummies']
 #DATA_DETAIL = ['explore param']
 DATA_DETAIL = ['no dummies'] if 'catboost' in ALGORITHM.lower() else []
+
+
+version_choices = [
+    '11',
+    '10',
+    '09',
+    '06'
+]
+
 #VERSION = '06'
 VERSION = '11'
+
+for i, each in zip(range(len(version_choices)), version_choices):
+    #print(f"int{each}: {each}")
+    print(f"{i+1}: {each}")
+    
+output = input("Which version do you want?  ")
+
+try:
+    chosen = int(output) - 1
+    if chosen < 0 or chosen > 11:raise ValueError()
+    VERSION = version_choices[chosen]
+except ValueError:
+    VERSION = version_choices[0]
+    print(f"\nNo valid choice made, using default[{VERSION}]\n")
 
 RANDOM_STATE = 101
 TRAINING_SIZE = 0.9
