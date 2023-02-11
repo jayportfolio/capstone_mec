@@ -37,6 +37,23 @@ import argparse
 
 FILENAME = 'all_models_except_neural_networks'
 
+import sys
+import subprocess
+import pkg_resources
+
+warnings = []
+
+required = {'tabulate', 'tabulate'}
+installed = {pkg.key for pkg in pkg_resources.working_set}
+missing = required - installed
+
+if missing:
+    python = sys.executable
+    subprocess.check_call([python, '-m', 'pip', 'install', *missing], stdout=subprocess.DEVNULL)
+    warning_message = 'Had to install missing packages:' + str(missing)
+    print(warning_message)
+    warnings.append(warning_message)
+    
 
 def get_commandline_or_userinput(user_params, user_question, which_arg):
     userparam_choices = list(user_params.values())
@@ -108,6 +125,22 @@ def main():
 
     question = "Which dataset version do you want?"
     VERSION = get_commandline_or_userinput(version_choices_dict, question, args.version)
+
+    if 'catboost' in ALGORITHM.lower() or 'lightgbm' in ALGORITHM.lower():
+        required = {'lightgbm', 'catboost'}
+        installed = {pkg.key for pkg in pkg_resources.working_set}
+        missing = required - installed
+
+        if missing:
+            python = sys.executable
+            subprocess.check_call([python, '-m', 'pip', 'install', *missing], stdout=subprocess.DEVNULL)
+            warning_message = 'Had to install missing packages:' + str(missing)
+            print(warning_message)
+            warnings.append(warning_message)
+    #else:
+    #    print(ALGORITHM)
+    #    print('quitting')
+    #    quit()
 
     # DATA_DETAIL = ['no scale','no dummies']
     # DATA_DETAIL = ['explore param']
@@ -293,7 +326,9 @@ def main():
     # * #### train the model
     #
     #
-    options_block, warnings = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION, api_version=2)
+    options_block, new_warnings = get_hyperparameters(ALGORITHM, use_gpu, prefix=prefix_dir_hyperparameters, version=VERSION, api_version=2)
+    if new_warnings:
+        warnings.extend(new_warnings)
 
     if 'explore param' in DATA_DETAIL:
         def automl_step(param_options, vary):
@@ -907,7 +942,7 @@ def main():
     print(f'FILENAME: {FILENAME}')
 
     if warnings:
-        print("Warnings:\n - ", "\n - ".join(warnings))
+        print("Warnings:\n -", "\n - ".join(warnings))
 
     print('\nFinished!')
 

@@ -109,7 +109,7 @@ def get_hyperparameters(key, use_gpu, prefix='./', version=None, api_version=Non
                 hyperparameters = json.loads(f.read())
         except FileNotFoundError as e:
             if version:
-                warnings.append("Had to look for a generic hyperparameter file even though a versioned hyperparameter file was requested.")
+                warnings.append("Had to look for an unversioned hyperparameter file even though a versioned hyperparameter file was requested.")
                 with open(unversioned_hp_file) as f:
                     hyperparameters = json.loads(f.read())
             else:
