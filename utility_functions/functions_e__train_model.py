@@ -29,7 +29,7 @@ def get_chosen_model(key):
     if key.lower() == 'catboost':
         from catboost import CatBoostRegressor
         CatBoostRegressor(objective='RMSE'),
-    elif key.lower() == 'stacked model':
+    elif key.lower() == 'stacked model [knn,lgb,xgb]':
         import lightgbm as lgb
         from lightgbm import LGBMRegressor
 
@@ -60,7 +60,6 @@ def get_chosen_model(key):
             "XG Boost (tree)".lower(): XGBRegressor(),
             "XG Boost (linear)".lower(): XGBRegressor(),
             "Linear Regression (Ridge)".lower(): Ridge(),
-            "Stacked Model".lower(): Ridge(),
             "knn": KNeighborsRegressor(),
             "decision tree": DecisionTreeRegressor(),
             "random forest": RandomForestRegressor(),
