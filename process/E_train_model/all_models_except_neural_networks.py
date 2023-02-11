@@ -864,74 +864,76 @@ def main():
     #
     # ## Stage: Write the final report for this algorithm and dataset version
 
+    create_report = 'best' not in ALGORITHM_DETAIL
 
-    include_in_html_report("header", section_content=f"Results from {ALGORITHM}", section_figure=1, prefix=prefix_dir_results_root, key=key)
+    if create_report:
+        include_in_html_report("header", section_content=f"Results from {ALGORITHM}", section_figure=1, prefix=prefix_dir_results_root, key=key)
 
-    end_timestamp = datetime.now()
+        end_timestamp = datetime.now()
 
-    include_in_html_report(type="text", section_header=f"Dataset Version: {VERSION}", section_content_list=[
-        f"Date run: {datetime.now()}"
-        "",
-        f"Start time: {start_timestamp}",
-        f"End time: {end_timestamp}",
-    ], prefix=prefix_dir_results_root, key=key)
-    include_in_html_report("header", section_content=f"Results", section_figure=2, prefix=prefix_dir_results_root, key=key)
+        include_in_html_report(type="text", section_header=f"Dataset Version: {VERSION}", section_content_list=[
+            f"Date run: {datetime.now()}"
+            "",
+            f"Start time: {start_timestamp}",
+            f"End time: {end_timestamp}",
+        ], prefix=prefix_dir_results_root, key=key)
+        include_in_html_report("header", section_content=f"Results", section_figure=2, prefix=prefix_dir_results_root, key=key)
 
-    include_in_html_report(type="text", section_header="Summary", section_content=new_model_decision, prefix=prefix_dir_results_root, key=key)
+        include_in_html_report(type="text", section_header="Summary", section_content=new_model_decision, prefix=prefix_dir_results_root, key=key)
 
-    # include_in_html_report(type="dataframe",text_single="Tuned Models ranked by performance", content=cv_results_df_sorted, prefix=prefix_dir_results_root, key=key)
+        # include_in_html_report(type="dataframe",text_single="Tuned Models ranked by performance", content=cv_results_df_sorted, prefix=prefix_dir_results_root, key=key)
 
-    if not using_catboost:
-        include_in_html_report(type='dataframe', section_header='Tuned Models ranked by performance, with parameter details', section_content=cv_results_df_summary,
+        if not using_catboost:
+            include_in_html_report(type='dataframe', section_header='Tuned Models ranked by performance, with parameter details', section_content=cv_results_df_summary,
+                                   prefix=prefix_dir_results_root, key=key)
+
+            include_in_html_report(type='graph', section_header='Best and worst models obtained by tuning', section_figure=worst_and_best_model_fig, section_content="best_and_worst.png",
+                                   prefix=prefix_dir_results_root, key=key)
+
+            include_in_html_report(type='graph', section_header='Best Model: Comparing model predictions to actual property values', section_figure=best_model_fig,
+                                   section_content='best_model_correlation.png', prefix=prefix_dir_results_root, key=key)
+        else:  # if using_catboost:
+            include_in_html_report(type="text", section_header="Model Specific Notes",
+                                   section_content_list=["can't display hyperparameter comparison for catboost", "can't display model performance graphs for catboost",
+                                                         "can't display model performance graphs for catboost"], prefix=prefix_dir_results_root, key=key)
+
+        if model_uses_feature_importances:
+            include_in_html_report("header", section_content=f"Feature Importances", section_figure=2, prefix=prefix_dir_results_root, key=key)
+            include_in_html_report(type="text", section_header="Feature Importances", section_content=feature_importances_output, prefix=prefix_dir_results_root, key=key)
+            include_in_html_report(type="graph", section_header=f"Feature Importances ({ALGORITHM})", section_figure=feature_importance_fig,
+                                   section_content='best_model_feature_importances.png', prefix=prefix_dir_results_root, key=key)
+
+        include_in_html_report("header", section_content=f"Comparison with other models", section_figure=2, prefix=prefix_dir_results_root, key=key)
+
+        # dff = pd.read_json('../../../results/results.json')
+        dff = pd.read_json(prefix_dir_results_root + '/results.json')
+
+        version = VERSION
+
+        all_models_df = dff[dff.columns].T.sort_values("best score", ascending=False)
+        version_models_df = dff[[c for c in dff.columns if version in c]].T.sort_values("best score", ascending=False)
+
+        version_models_summary = version_models_df[
+            ['best score', 'best time', 'Mean Absolute Error Accuracy', 'Mean Squared Error Accuracy', 'R square Accuracy', 'Root Mean Squared Error', 'best run date', 'best method']]
+        all_models_summary = all_models_df[
+            ['best score', 'best time', 'Mean Absolute Error Accuracy', 'Mean Squared Error Accuracy', 'R square Accuracy', 'Root Mean Squared Error', 'best run date', 'best method']]
+
+        include_in_html_report(type="dataframe", section_header=f"Comparison with version {VERSION} performances", section_content=version_models_summary, prefix=prefix_dir_results_root,
+                               key=key)
+        include_in_html_report(type="dataframe", section_header="Comparison with all model performances", section_content=all_models_summary, prefix=prefix_dir_results_root, key=key)
+
+        include_in_html_report("header", section_content=f"Appendix", section_figure=2, prefix=prefix_dir_results_root, key=key)
+
+        include_in_html_report(type="dataframe", section_header="Data Sample", section_content=df.head(5), prefix=prefix_dir_results_root, key=key)
+
+        include_in_html_report(type="json", section_header="Hyperparameter options for Randomized Grid Search", section_content=f"{param_options if not using_catboost else options_block}",
                                prefix=prefix_dir_results_root, key=key)
 
-        include_in_html_report(type='graph', section_header='Best and worst models obtained by tuning', section_figure=worst_and_best_model_fig, section_content="best_and_worst.png",
-                               prefix=prefix_dir_results_root, key=key)
+        if not using_catboost:
+            include_in_html_report(type="graph", section_header=f"Range of hyperparameter results", section_figure=evolution_of_models_fig,
+                                   section_content='evolution_of_models_fig.png', prefix=prefix_dir_results_root, key=key)
 
-        include_in_html_report(type='graph', section_header='Best Model: Comparing model predictions to actual property values', section_figure=best_model_fig,
-                               section_content='best_model_correlation.png', prefix=prefix_dir_results_root, key=key)
-    else:  # if using_catboost:
-        include_in_html_report(type="text", section_header="Model Specific Notes",
-                               section_content_list=["can't display hyperparameter comparison for catboost", "can't display model performance graphs for catboost",
-                                                     "can't display model performance graphs for catboost"], prefix=prefix_dir_results_root, key=key)
-
-    if model_uses_feature_importances:
-        include_in_html_report("header", section_content=f"Feature Importances", section_figure=2, prefix=prefix_dir_results_root, key=key)
-        include_in_html_report(type="text", section_header="Feature Importances", section_content=feature_importances_output, prefix=prefix_dir_results_root, key=key)
-        include_in_html_report(type="graph", section_header=f"Feature Importances ({ALGORITHM})", section_figure=feature_importance_fig,
-                               section_content='best_model_feature_importances.png', prefix=prefix_dir_results_root, key=key)
-
-    include_in_html_report("header", section_content=f"Comparison with other models", section_figure=2, prefix=prefix_dir_results_root, key=key)
-
-    # dff = pd.read_json('../../../results/results.json')
-    dff = pd.read_json(prefix_dir_results_root + '/results.json')
-
-    version = VERSION
-
-    all_models_df = dff[dff.columns].T.sort_values("best score", ascending=False)
-    version_models_df = dff[[c for c in dff.columns if version in c]].T.sort_values("best score", ascending=False)
-
-    version_models_summary = version_models_df[
-        ['best score', 'best time', 'Mean Absolute Error Accuracy', 'Mean Squared Error Accuracy', 'R square Accuracy', 'Root Mean Squared Error', 'best run date', 'best method']]
-    all_models_summary = all_models_df[
-        ['best score', 'best time', 'Mean Absolute Error Accuracy', 'Mean Squared Error Accuracy', 'R square Accuracy', 'Root Mean Squared Error', 'best run date', 'best method']]
-
-    include_in_html_report(type="dataframe", section_header=f"Comparison with version {VERSION} performances", section_content=version_models_summary, prefix=prefix_dir_results_root,
-                           key=key)
-    include_in_html_report(type="dataframe", section_header="Comparison with all model performances", section_content=all_models_summary, prefix=prefix_dir_results_root, key=key)
-
-    include_in_html_report("header", section_content=f"Appendix", section_figure=2, prefix=prefix_dir_results_root, key=key)
-
-    include_in_html_report(type="dataframe", section_header="Data Sample", section_content=df.head(5), prefix=prefix_dir_results_root, key=key)
-
-    include_in_html_report(type="json", section_header="Hyperparameter options for Randomized Grid Search", section_content=f"{param_options if not using_catboost else options_block}",
-                           prefix=prefix_dir_results_root, key=key)
-
-    if not using_catboost:
-        include_in_html_report(type="graph", section_header=f"Range of hyperparameter results", section_figure=evolution_of_models_fig,
-                               section_content='evolution_of_models_fig.png', prefix=prefix_dir_results_root, key=key)
-
-    include_in_html_report(type="dict", section_header="Environment Variables", section_content=env_vars, prefix=prefix_dir_results_root, key=key)
+        include_in_html_report(type="dict", section_header="Environment Variables", section_content=env_vars, prefix=prefix_dir_results_root, key=key)
 
     print('Nearly finished...')
 

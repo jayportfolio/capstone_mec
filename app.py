@@ -12,7 +12,7 @@ from sklearn.model_selection import cross_validate, cross_val_predict
 
 from utility_functions.functions_b__get_the_data import get_source_dataframe
 from utility_functions.functions_d3__prepare_store_data import this_test_data
-from utility_functions.functions_gh_presentation_and_launch import load_model
+from utility_functions.functions_gh_presentation_and_launch import load_model, get_webapp_models
 
 RAND_INDEX_CSV = "webapp_deployment/cache/rand_index.csv"
 #RANDOM_INSTANCE_CSV = "random_instance.csv"
@@ -40,6 +40,7 @@ prediction_models = {
     'Linear Regression (data version 6) - Poor model': 'optimised_model_Linear Regression (Ridge)_v06',
 }
 
+prediction_models = get_webapp_models()
 
 def main():
     global X_test, y_test, feature_names, rand_index, DATA_VERSION, previous_data_version
@@ -60,12 +61,15 @@ def main():
     selected_model_key = st.selectbox('Which model do you want to use?', available_models)
 
     selected_model = prediction_models[selected_model_key]
+    print("selected_model",selected_model)
+    print("selected_model_key",selected_model_key)
     model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
 
     # manual_parameters = st.checkbox('Use manual parameters instead of sample')
     manual_parameters = False
     if not manual_parameters:
-        DATA_VERSION = selected_model[-2:]
+        DATA_VERSION = selected_model_key[-3:-1]
+        print("DATA_VERSION", DATA_VERSION)
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
         test_size = len(y_test)
         #pass
@@ -87,6 +91,8 @@ def main():
 
     if st.button('Predict'):
         DATA_VERSION = selected_model[-2:]
+        DATA_VERSION = selected_model_key[-3:-1]
+
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
         try:
             acc = model.score(X_test, y_test)
@@ -124,6 +130,8 @@ def main():
                     print("saved new rand_index of", rand_index)
 
                 DATA_VERSION = selected_model[-2:]
+                DATA_VERSION = selected_model_key[-3:-1]
+
                 X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
 
                 previous_data_version = DATA_VERSION
@@ -200,6 +208,8 @@ def main():
 
     if st.checkbox('View all available predictions (entire test set)'):
         DATA_VERSION = selected_model[-2:]
+        DATA_VERSION = selected_model_key[-3:-1]
+
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
         try:
             acc = model.score(X_test, y_test)
@@ -223,6 +233,8 @@ def main():
 
     if st.checkbox('Show the underlying dataframe'):
         DATA_VERSION = selected_model[-2:]
+        DATA_VERSION = selected_model_key[-3:-1]
+
         df, df_type = get_source_dataframe(cloud_or_webapp_run=True, version=DATA_VERSION, folder_prefix='')
         print("claiming to be colab so I can use the cloud version of data and save space")
         st.write(df)
