@@ -46,9 +46,9 @@ def main():
     global X_test, y_test, feature_names, rand_index, DATA_VERSION, previous_data_version
 
     st.markdown(
-        "<h1 style='text-align: center; color: White;background-color:#e84343'>London Property Prices Predictor</h1>",
+        "<h2 style='text-align: center; color: White;background-color:#e84343'>London Property Prices Predictor</h2>",
         unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align: center; color: Black;'>Choose a random property and a prediction algorithm, and predict the property price</h4>",
+    st.markdown("<h5 style='text-align: center; color: Black;'>Choose your algorithm and feature set to make property price predictions</h5>",
                 unsafe_allow_html=True)
 
     st.sidebar.header("What is this Project about?")
@@ -98,7 +98,7 @@ def main():
 
     if st.button('Choose another random property, and predict'):
         test_size = change_the_random_property(DATA_VERSION, test_size)
-        model = predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size)
+        model = predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size, update_property=False)
 
 
     if st.button('Predict again for the same property'):
@@ -138,7 +138,7 @@ def main():
         st.write(df)
 
 
-def predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size):
+def predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size, update_property=True):
     global DATA_VERSION, X_test, y_test, feature_names, rand_index, previous_data_version
     DATA_VERSION = selected_model[-2:]
     DATA_VERSION = selected_model_version
@@ -191,7 +191,8 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
             random_instance_plus.extend(random_instance[0])
             np.savetxt(RANDOM_INSTANCE_PLUS_CSV, random_instance_plus, delimiter=",")
 
-        update_about_property(feature_names, rand_index, random_instance)
+        if update_property:
+            update_about_property(feature_names, rand_index, random_instance)
 
         # st.text(f'Actual value of property {rand_index}: {expected}')
     # print("inputs:", inputs)
@@ -222,18 +223,10 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
     difference = abs(expected - updated_res[0])
     if difference < 10000:
         remark,colour = 'good','limegreen'
-    elif difference < 80000:
+    elif difference < 50000:
         remark,colour = 'ok','khaki' #'yellow'
     else:
         remark, colour = 'poor','lightcoral' # 'red'
-
-    st.info('The actual price for this property is £{:.0f}'.format(expected))
-    if remark == 'good':
-        st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
-    elif remark == 'ok':
-        st.warning('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
-    else:
-        st.error('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
 
     fig, ax = plt.subplots()
     # X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
@@ -259,6 +252,15 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
     ax.set_ylabel('Predicted property price')
     plt.ticklabel_format(style='plain')
     st.pyplot(fig)
+
+    st.info('The actual price for this property is £{:.0f}'.format(expected))
+    if remark == 'good':
+        st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+    elif remark == 'ok':
+        st.warning('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+    else:
+        st.error('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+
     return model
 
 
