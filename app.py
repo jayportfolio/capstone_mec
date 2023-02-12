@@ -54,7 +54,7 @@ def main():
     st.markdown("<h5 style='text-align: center; color: Black;'>Choose your algorithm and feature set to make property price predictions</h5>",
                 unsafe_allow_html=True)
 
-    st.sidebar.header("Property information will be displayed here")
+    st.sidebar.header("")
     # st.sidebar.markdown(
     #     "This is a Web app that can predict the price of a London property based on features of that property.")
     # st.sidebar.header("Sidebar Options")
@@ -110,7 +110,8 @@ def main():
 
         if container_col1_header.button('Predict again for the same property'):
             model = predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size, update_property=False, updateable=container_col1_data)
-
+            rand_index, predict_instance, single_real_price = get_random_instance(X_test, y_test)
+            update_about_property(feature_names, rand_index, predict_instance)
 
     with col3:
         X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=True, versioned=True)
@@ -145,6 +146,8 @@ def main():
             y_pred = model.predict(X_test).flatten()
             multiple_predictions = np.vstack((y_test.flatten(), y_pred)).T
             multiple_predictions_df = pd.DataFrame(multiple_predictions, columns=['Actual Price', 'Predicted Price'])
+            multiple_predictions_df['Actual Price'] = pd.to_numeric(multiple_predictions_df['Actual Price']).astype(int)
+            multiple_predictions_df['Predicted Price'] = pd.to_numeric(multiple_predictions_df['Predicted Price']).astype(int)
 
             st.write(multiple_predictions_df)
             print("type(multiple_predictions_df):", type(multiple_predictions_df))
@@ -206,9 +209,9 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
     y_pred = model.predict(X_test).flatten()
     if 'eural' in selected_model_key:
         from sklearn.metrics import r2_score
-        updateable.write('Score:', r2_score(y_test, y_pred))
+        st.write('Score:', r2_score(y_test, y_pred))
         try:
-            updateable.write('Accuracy of test set: ', acc)
+            st.write('Accuracy of test set: ', acc)
         except:
             pass
     ax.scatter(y_test, y_pred, s=25, c='silver')
