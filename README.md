@@ -36,6 +36,16 @@ I ultimately decided that I would obtain feature data using a popular estate age
 
 ##### More information about the data collection techniques utilised:<br>[summary of dataset options.md](capstone_steps%2Fstep_02%2Fsummary%20of%20dataset%20options.md)
 
+##### Running the data collection web scraping scripts:
+* Web scraping to collect listings data (included for illustrative purposes):
+<br>`python process/B_get_the_data/01_scrape_data_listings.py`
+<br>[01_scrape_data_listings.py](process%2FB_get_the_data%2F01_scrape_data_listings.py)
+<br><br>
+* Web scraping to collect detailed item data (included for illustrative purposes):
+<br>`python process/B_get_the_data/03_scrape_data_items.py`
+<br>[03_scrape_data_items.py](process%2FB_get_the_data%2F03_scrape_data_items.py)
+<br><br>
+
 ##### More information about my project proposal:<br>[04_project_proposal.md](capstone_steps%2Fstep_04%2F04_project_proposal.md)
 
 ##### More information wrangling and cleaning my data: <br>[05__data_wrangling.md](capstone_steps%2Fstep_05%2F05__data_wrangling.md)
