@@ -96,12 +96,12 @@ def main():
     if st.sidebar.button('Change the random property!'):
         test_size = change_the_random_property(DATA_VERSION, test_size)
 
-    if st.button('Choose another random property, and Predict'):
+    if st.button('Choose another random property, and predict'):
         test_size = change_the_random_property(DATA_VERSION, test_size)
         model = predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size)
 
 
-    if st.button('Predict'):
+    if st.button('Predict again for the same property'):
         model = predict_and_display(manual_parameters, model, selected_model, selected_model_key, selected_model_name, selected_model_version, test_size)
 
     if st.checkbox('View all available predictions (entire test set)'):
@@ -218,8 +218,23 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
     # result = model.predict(X_test)
     result = model.predict(random_instance)
     updated_res = result.flatten().astype(float)
-    st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]))
-    st.warning('The actual price for this property is £{:.0f}'.format(expected))
+
+    difference = abs(expected - updated_res[0])
+    if difference < 10000:
+        remark,colour = 'good','limegreen'
+    elif difference < 80000:
+        remark,colour = 'ok','khaki' #'yellow'
+    else:
+        remark, colour = 'poor','lightcoral' # 'red'
+
+    st.info('The actual price for this property is £{:.0f}'.format(expected))
+    if remark == 'good':
+        st.success('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+    elif remark == 'ok':
+        st.warning('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+    else:
+        st.error('The predicted price for this property is £{:.0f}'.format(updated_res[0]) + '\n')
+
     fig, ax = plt.subplots()
     # X_test, y_test, feature_names = this_test_data(VERSION=DATA_VERSION, test_data_only=True, cloud_or_webapp_run=False, versioned=True)
     # model = load_model_wrapper(selected_model, model_type='neural' if 'eural' in selected_model_key else 'standard')
@@ -233,14 +248,8 @@ def predict_and_display(manual_parameters, model, selected_model, selected_model
             pass
     ax.scatter(y_test, y_pred, s=25, c='silver')
     # ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2, c='black')
-    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], lw=2, c='black')
-    difference = abs(expected - updated_res[0])
-    if difference < 10000:
-        colour = 'lime'
-    elif difference < 80000:
-        colour = 'orange'
-    else:
-        colour = 'red'
+    ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], lw=1, c='dimgray')
+
     try:
         ax.scatter(expected, updated_res[0], s=100, c=colour)
     except:
