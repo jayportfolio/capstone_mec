@@ -319,7 +319,8 @@ def update_about_property(feature_names, rand_index, predict_instance, updatable
         print("|| 24:", "fix_to:", fix_to)
         image = get_image_for_property(bedrooms, property_type, str(fix_to))
 
-        st.sidebar.image(image, caption='Image of two bedroom flat')
+        #st.sidebar.image(image, caption='Image of two bedroom flat')
+        st.sidebar.image(image)
 
         st.sidebar.table(random_instance_df)
         for each in updatables:
